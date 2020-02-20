@@ -1,5 +1,6 @@
 package tetris;
 
+
 public class Cell {
 
 	// Represents a cell in a grid

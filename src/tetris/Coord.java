@@ -1,5 +1,6 @@
 package tetris;
 
+
 public final class Coord {
 	
 	// SHAPE CONSTANTS

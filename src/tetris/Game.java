@@ -1,5 +1,6 @@
 package tetris;
 
+
 import javax.swing.*;
 
 public class Game {
@@ -13,25 +14,14 @@ public class Game {
 	private double gameSpeed = SLOW_SPEED;
 
 	// OBJECT REFERENCES
-	private final Grid GRID;
-	private final GameInput GAMEINPUT;
-
-	// SWING COMPONENTS
-	JLabel gameContent;
-	JFrame gameFrame;
-	JPanel gamePanel;
+	private final Grid GRID;;
+	
+	// SWING
+	private JLabel gameContent = new JLabel("");
 
 	// CONSTRUCTOR
 	public Game() {
-		GAMEINPUT = new GameInput( this );
 		GRID = new Grid( this);
-		gameContent = new JLabel();
-		gameFrame = new JFrame();
-		gameFrame.addKeyListener( GAMEINPUT );
-		gamePanel = new JPanel();
-		gamePanel.add( gameContent );
-		gameFrame.add( gamePanel );
-		gameFrame.setSize( 300, 750 );
 	}
 
 	// RETURN GAME STATE
@@ -50,15 +40,19 @@ public class Game {
 	}
 
 	// STARTS THE GAME
-	public void start() {
-		gameFrame.setVisible( true );
+	public void start(JFrame frame) {
+		gameContent = new JLabel("");
+		JPanel panel = new JPanel();
+		panel.add( gameContent );
+		frame.add( panel );
+		frame.setSize( 300, 750 );
+		frame.setLocationRelativeTo( null );
+		
+		frame.addKeyListener( new GameInput(this) );
 		play();
-	}
-
-	// STOPS THE GAME
-	public void stop() {
+		
 		gameOver = true;
-		gameFrame.setVisible( false );
+		frame.remove(panel);
 	}
 
 	// RUNS THE GAME
@@ -97,8 +91,6 @@ public class Game {
 			// UPDATES DISPLAY
 			gameContent.setText( GRID.printGrid() );
 		}
-		// STOPS GAME WHEN OVER
-		stop();
 	}
 
 	private void gravity() {
@@ -165,7 +157,8 @@ public class Game {
 		
 		// QUIT
 		if ( input == GameInput.INPUT_TYPE.QUIT ) {
-			stop();
+			gameOver = true;
+			System.out.println( "INPUTTTTT" );
 		}
 
 	}

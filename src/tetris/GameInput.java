@@ -1,5 +1,6 @@
 package tetris;
 
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -15,6 +16,7 @@ public class GameInput extends KeyAdapter {
 
 	public GameInput( Game game ) {
 		this.game = game;
+		System.out.println( "TEST23525" );
 	}
 
 	@Override
@@ -23,18 +25,22 @@ public class GameInput extends KeyAdapter {
 		//
 		if ( event.getKeyCode() == KeyEvent.VK_ESCAPE ) {
 			game.input( INPUT_TYPE.QUIT );
+			System.out.println( 1 );
 		}
 
 		if ( event.getKeyCode() == KeyEvent.VK_LEFT ) {
 			game.input( INPUT_TYPE.LEFT );
+			System.out.println( 2 );
 		}
 
 		if ( event.getKeyCode() == KeyEvent.VK_RIGHT ) {
 			game.input( INPUT_TYPE.RIGHT );
+			System.out.println( 3 );
 		}
 
 		if ( event.getKeyCode() == KeyEvent.VK_UP ) {
 			game.input( INPUT_TYPE.TURN );
+			System.out.println( 4 );
 		}
 		if ( event.getKeyCode() == KeyEvent.VK_DOWN ) {
 			game.input( INPUT_TYPE.SPEEDUP );
@@ -46,6 +52,7 @@ public class GameInput extends KeyAdapter {
 
 		if ( event.getKeyCode() == KeyEvent.VK_DOWN ) {
 			this.game.input( INPUT_TYPE.SLOWDOWN );
+			System.out.println( 5 );
 		}
 	}
 }
