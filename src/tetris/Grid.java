@@ -2,57 +2,73 @@ package tetris;
 
 public class Grid {
 
-	// Represente le terrain de jeu
+	// OBJECT REFERENCES
 	private final Game GAME;
 
-	private int height, width;
-	private Cell[][] cells;
+	//CONSTANTS
+	public static final int  WIDTH = 10, HEIGHT = 24;
+	private Cell[][] CELLS;
 
-	public Grid( Game game, int width, int height ) {
+	// CONTRUCTOR
+	public Grid( Game game) {
 		GAME = game;
-		this.height = height;
-		this.width = width;
-		this.cells = generateField();
+		CELLS = generateField();
 	}
 
+	// RETURNS CELLS
 	public Cell[][] getCells() {
-		return cells;
+		return CELLS;
 	}
 
+	// CREATES GRID
 	private Cell[][] generateField() {
-		Cell[][] cells = new Cell[this.width][this.height];
-		for ( int x = 0; x < this.width; x++ ) {
-			for ( int y = this.height - 1; y >= 0; y-- ) {
+		Cell[][] cells = new Cell[WIDTH][HEIGHT];
+		for ( int x = 0; x < WIDTH; x++ ) {
+			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
 				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY );
 			}
 		}
 		return cells;
 	}
 
+	// RETURNS A HTML STRING WITH THE GAMEFIELD
 	public String printGrid() {
 
+		// ADDS CELLS
 		String game = "";
-		for ( int y = this.height - 1; y >= 0; y-- ) {
-			for ( int x = 0; x < this.width; x++ ) {
+		for ( int y = HEIGHT - 1; y >= 0; y-- ) {
+			for ( int x = 0; x < WIDTH; x++ ) {
 
-				game += cells[x][y].getStateChar();
+				game += getCells()[x][y].getStateChar();
 			}
 			game += "<br/>";
 		}
 
+		// ADDS EXTRA TEXT
 		game = String.format( "<html><h1>Score: %d</h1><h2>%s</h2></html>", GAME.getScore(), game );
+		
 		return game;
 	}
 
+	// RETURNS ALL ACTIVE CELLS ON FIELD
 	public Coord[] findActiveCells() {
+		
+		// VARIABLES
 		Cell[][] cells = this.getCells();
 		Coord[] activeCells = new Coord[0];
+		
+		// FOR EACH CELL
 		for ( int x = 0; x < cells.length; x++ ) {
 			for ( int y = 0; y < cells[x].length; y++ ) {
+				
+				// CHECK IF ACTIVE
 				if ( cells[x][y].getState() == Cell.STATE.ACTIVE ) {
+					
+					// MAKES ARRAY FIT THE NUMBER OF CELLS
 					Coord[] temp = activeCells.clone();
 					activeCells = new Coord[activeCells.length + 1];
 					System.arraycopy( temp, 0, activeCells, 0, temp.length );
+					// ADD CELL
 					activeCells[activeCells.length - 1] = new Coord( x, y );
 				}
 			}
@@ -60,7 +76,10 @@ public class Grid {
 		return activeCells;
 	}
 
+	// MOVE A GROUP OF CELLS
 	public void moveCells( Coord[] coords, int deltaX, int deltaY ) {
+		
+		// VARIABLES
 		Coord[] activeCoords = this.findActiveCells();
 		boolean valid = true;
 
@@ -68,12 +87,13 @@ public class Grid {
 		for ( int i = 0; i < coords.length; i++ ) {
 			coords[i] = new Coord( coords[i].getX() + deltaX, coords[i].getY() + deltaY );
 			// coord.setY( coord.getY() + deltaY );
-			if ( !Coord.isInLimits( coords[i], this.width, this.height ) ) {
+			if ( !Coord.isInLimits( coords[i], WIDTH, HEIGHT ) ) {
 				valid = false;
 			} else if ( this.getCells()[coords[i].getX()][coords[i].getY()].getState() == Cell.STATE.FULL ) {
 				valid = false;
 			}
 		}
+		// CHECK NEW POSITION WAS OCCUPIED
 		if ( valid ) {
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
@@ -92,7 +112,10 @@ public class Grid {
 		}
 	}
 
+	// ROTATE A GROUP OF CELLS
 	public void rotateCells( Coord[] coords ) {
+		
+		// VARIABLES
 		Coord bottomLeft = new Coord( 200, 200 );
 		Coord[] relative;
 
@@ -129,22 +152,27 @@ public class Grid {
 		moveCells( coords, 0, 0 );
 	}
 
+	// UPDATES LINES
 	public void clearLines() {
-		// CLEAR LINES
-		for ( int y = 0; y < height; y++ ) {
+		
+		// CHECKS IF LINES ARE FULL
+		for ( int y = 0; y < HEIGHT; y++ ) {
 			boolean isLineFull = true;
-			for ( int x = 0; x < width; x++ ) {
+			for ( int x = 0; x < WIDTH; x++ ) {
 				if ( this.getCells()[x][y].getState() == Cell.STATE.EMPTY ) {
 					isLineFull = false;
 				}
 			}
+			// CLEARS THE FILLED LINE
 			if ( isLineFull ) {
+				
 				GAME.addScore( 1 );
-				for ( int x = 0; x < width; x++ ) {
+				for ( int x = 0; x < WIDTH; x++ ) {
 					this.getCells()[x][y].setState( Cell.STATE.EMPTY );
 				}
-				for ( int i = y; i < height - 1; i++ ) {
-					for ( int x = 0; x < width; x++ ) {
+				// DROPS THE LINES
+				for ( int i = y; i < HEIGHT - 1; i++ ) {
+					for ( int x = 0; x < WIDTH; x++ ) {
 						this.getCells()[x][i].setState( this.getCells()[x][i + 1].getState() );
 						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY );
 					}
@@ -154,10 +182,11 @@ public class Grid {
 
 	}
 
+	// CHECK IF GAME IS OVER
 	public boolean isDead() {
 		boolean dead = false;
-		for ( int i = 0; i < width; i++ ) {
-			if ( this.getCells()[i][height - 1].getState() == Cell.STATE.FULL ) {
+		for ( int i = 0; i < WIDTH; i++ ) {
+			if ( this.getCells()[i][HEIGHT - 1].getState() == Cell.STATE.FULL ) {
 				dead = true;
 				System.out.println( "Game Over" );
 			}

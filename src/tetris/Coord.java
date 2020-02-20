@@ -2,6 +2,7 @@ package tetris;
 
 public final class Coord {
 	
+	// SHAPE CONSTANTS
 	public final static Coord[] SHAPE_T = { new Coord( 0, 0 ), new Coord( 1, 0 ), new Coord( 2, 0 ),
 			new Coord( 1, 1 ) }; // T-Block
 	public final static Coord[] SHAPE_O = { new Coord( 0, 0 ), new Coord( 0, 1 ), new Coord( 1, 0 ),
@@ -19,25 +20,31 @@ public final class Coord {
 
 	public final static Coord[][] SHAPES = { SHAPE_T, SHAPE_O, SHAPE_S, SHAPE_Z, SHAPE_L, SHAPE_J, SHAPE_I };
 
-	public static Coord[] randomShape() {
-		return SHAPES[(int) ( Math.random() * SHAPES.length )];
-	}
-
+	// CONSTANTS
 	private final int x, y;
-
+	
+	// CONSTRUCTOR
 	public Coord( int x, int y ) {
 		this.x = x;
 		this.y = y;
 	}
+	
+	// RETURNS A RANDOM SHAPE
+	public static Coord[] randomShape() {
+		return SHAPES[(int) ( Math.random() * SHAPES.length )];
+	}
 
+	// RETURNS X
 	public int getX() {
 		return this.x;
 	}
 
+	// RETURNS Y
 	public int getY() {
 		return this.y;
 	}
 
+	// RETURNS WIDTH OF AN ARRAY OF COORDINATES
 	public static int calculateWidth( Coord[] coords ) {
 		int width = 0;
 		for ( int i = 0; i < coords.length; i++ ) {
@@ -47,6 +54,7 @@ public final class Coord {
 		return width;
 	}
 
+	// RETURNS HEIGHT OF AN ARRAY OF COORDINATES
 	public static int calculateHeight( Coord[] coords ) {
 		int height = 0;
 		for ( int i = 0; i < coords.length; i++ ) {
@@ -56,6 +64,7 @@ public final class Coord {
 		return height;
 	}
 
+	// CHECKS IF COORDINATES ARE WITHIN THE BOARD
 	public static boolean isInLimits( Coord coord, int width, int height ) {
 		boolean isInLimits = true;
 		if ( coord.getX() < 0 || coord.getX() > width - 1 ) {
