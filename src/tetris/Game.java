@@ -4,122 +4,168 @@ import javax.swing.*;
 
 public class Game {
 
-	private boolean stopped;
+	// CONSTANTS
+	private final double SLOW_SPEED = 1000, FAST_SPEED = 50;
 
-	final static int WIDTH = 10, HEIGHT = 24;
-	Grid grid;
-	JLabel monTexte;
-	JFrame frame;
-	JPanel panel;
-	GameInput gameInput;
+	// VARIABLES
+	private boolean gameOver = false;
+	private int score = 0;
+	private double gameSpeed = SLOW_SPEED;
 
+	// OBJECT REFERENCES
+	private final Grid GRID;
+	private final GameInput GAMEINPUT;
+
+	// SWING COMPONENTS
+	JLabel gameContent;
+	JFrame gameFrame;
+	JPanel gamePanel;
+
+	// CONSTRUCTOR
 	public Game() {
-		gameInput = new GameInput( this );
-		this.grid = new Grid( WIDTH, HEIGHT );
-		monTexte = new JLabel();
-		frame = new JFrame();
-		frame.addKeyListener( gameInput );
-		panel = new JPanel();
-		panel.add( monTexte );
-		frame.add( panel );
-		frame.setSize( 400, 800 );
-		stopped = false;
+		GAMEINPUT = new GameInput( this );
+		GRID = new Grid( this);
+		gameContent = new JLabel();
+		gameFrame = new JFrame();
+		gameFrame.addKeyListener( GAMEINPUT );
+		gamePanel = new JPanel();
+		gamePanel.add( gameContent );
+		gameFrame.add( gamePanel );
+		gameFrame.setSize( 300, 750 );
 	}
 
+	// RETURN GAME STATE
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	// RETURN GAME SCORE
+	public int getScore() {
+		return score;
+	}
+
+	// ADDS POINTS TO THE SCORE
+	public void addScore( int points ) {
+		score += points;
+	}
+
+	// STARTS THE GAME
 	public void start() {
-		System.out.println( "Starting game." );
-		frame.setVisible( true );
-		gameTicker();
+		gameFrame.setVisible( true );
+		play();
 	}
 
-	private void gameTicker() {
-		final double SPEED = 100;
-		double lastTime = SPEED;
+	// STOPS THE GAME
+	public void stop() {
+		gameOver = true;
+		gameFrame.setVisible( false );
+	}
 
-		while ( !this.stopped ) {
-			if ( System.currentTimeMillis() - lastTime >= SPEED ) {
+	// RUNS THE GAME
+	private void play() {
+		double lastTime = gameSpeed;
+
+		while ( !gameOver ) {
+			// CONTROLS CYCLE SPEED
+			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
 				lastTime = System.currentTimeMillis();
 
-				if ( grid.findActiveCells().length == 0 ) {
-					//Coord[] shape = Shape.randomShape();
-					Coord[] shape = {new Coord(0,0)};
+				// SPAWNS SHAPE WHEN NONE IS PRESENT
+				if ( GRID.findActiveCells().length == 0 ) {
 
+					// VARIABLES
+					Coord[] shape = Coord.randomShape();
 					int height = Coord.calculateHeight( shape );
 					int width = Coord.calculateWidth( shape );
+					int middle = ( Grid.WIDTH - width ) / 2;
 
-					int random = (int) ( Math.random() * ( WIDTH - width ) );
-
+					// PLACES CELLS ON GRID
 					for ( int i = 0; i < shape.length; i++ ) {
-						Cell temp = grid.getCells()[random + shape[i].getX()][( HEIGHT )
+						Cell temp = GRID.getCells()[middle + shape[i].getX()][( Grid.HEIGHT )
 								- ( height - shape[i].getY() )];
-						temp.setState( Cell.ACTIVE );
+
+						temp.setState( Cell.STATE.ACTIVE );
 					}
 				}
 
-				//gravity();
-				monTexte.setText( grid.printGrid() );
+				// RUN METHODS
+				gravity();
+				GRID.clearLines();
+				gameOver = GRID.isDead();
 			}
+
+			// UPDATES DISPLAY
+			gameContent.setText( GRID.printGrid() );
 		}
+		// STOPS GAME WHEN OVER
+		stop();
 	}
 
 	private void gravity() {
 
-		Coord[] activeCells = grid.findActiveCells();
+		// MAKES SURE A SHAPE EXISTS
+		Coord[] activeCells = GRID.findActiveCells();
 		if ( activeCells.length > 0 ) {
 
 			boolean isUnderneathClear = true;
 
-			// CHECK
+			// CHECK IF AT LEAST ONE CELL IS TOUCHING FULL
 			for ( int i = 0; i < activeCells.length; i++ ) {
 
+				// LINES THAT ARENT THE LAST
 				if ( activeCells[i].getY() != 0 ) {
-					Cell cellUnder = grid.getCells()[activeCells[i].getX()][activeCells[i].getY() - 1];
 
-					if ( cellUnder.getState() == Cell.FULL ) {
+					// IF TOUCHES
+					Cell cellUnder = GRID.getCells()[activeCells[i].getX()][activeCells[i].getY() - 1];
+					if ( cellUnder.getState() == Cell.STATE.FULL ) {
 						isUnderneathClear = false;
 					}
 
+					// LAST LINE
 				} else {
 					isUnderneathClear = false;
 				}
 			}
 
-			// APPLY
-			// IF CLEAR
-			for ( int i = 0; i < activeCells.length; i++ ) {
-				// IF CELL UNDERNEATH IS GROUNDED
-				if ( !isUnderneathClear ) {
-					grid.getCells()[activeCells[i].getX()][activeCells[i].getY()].setState( Cell.FULL );
-				}
-
-			}
-
+			// LOWERS CELLS
 			if ( isUnderneathClear ) {
-				grid.moveCells( activeCells, 0, -1 );
+				GRID.moveCells( activeCells, 0, -1 );
+			}
+			// GROUNDS CELLS
+			else {
+				for ( int i = 0; i < activeCells.length; i++ ) {
+					GRID.getCells()[activeCells[i].getX()][activeCells[i].getY()].setState( Cell.STATE.FULL );
 
+				}
 			}
 		}
 	}
 
-	public void stop() {
-		System.out.println( "Stopping game." );
-		this.stopped = true;
-		frame.setVisible( false );
-		System.exit( 0 );
-	}
+	public void input( GameInput.INPUT_TYPE input ) {
 
-	public void move( int direction ) {
+		Coord[] activeCells = GRID.findActiveCells();
 
-		Coord[] activeCells = grid.findActiveCells();
+		// MOVEMENT INPUT
 		if ( activeCells.length > 0 ) {
-			if ( direction == -1 ) {
-				grid.moveCells( activeCells, -1, 0 );
-			} else if ( direction == 1 ) {
-				grid.moveCells( activeCells, 1, 0 );
+			if ( input == GameInput.INPUT_TYPE.LEFT ) {
+				GRID.moveCells( activeCells, -1, 0 );
+			} else if ( input == GameInput.INPUT_TYPE.RIGHT ) {
+				GRID.moveCells( activeCells, 1, 0 );
+			} else if ( input == GameInput.INPUT_TYPE.TURN ) {
+				GRID.rotateCells( activeCells );
 			}
-			else if(direction == 0) {
-				grid.rotateCells( activeCells );
-			}
+		}	
+		
+		// SPEED INPUT
+		if ( input == GameInput.INPUT_TYPE.SLOWDOWN ) {
+			gameSpeed = SLOW_SPEED;
+		} else if ( input == GameInput.INPUT_TYPE.SPEEDUP ) {
+			gameSpeed = FAST_SPEED;
+		}
+		
+		// QUIT
+		if ( input == GameInput.INPUT_TYPE.QUIT ) {
+			stop();
 		}
 
 	}
