@@ -160,7 +160,7 @@ public class Grid {
 		for ( int y = 0; y < HEIGHT; y++ ) {
 			boolean isLineFull = true;
 			for ( int x = 0; x < WIDTH; x++ ) {
-				if ( this.getCells()[x][y].getState() == Cell.STATE.EMPTY ) {
+				if ( this.getCells()[x][y].getState() != Cell.STATE.FULL ) {
 					isLineFull = false;
 				}
 			}

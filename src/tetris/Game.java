@@ -6,12 +6,13 @@ import javax.swing.*;
 public class Game {
 
 	// CONSTANTS
-	private final double SLOW_SPEED = 1000, FAST_SPEED = 50;
-
+	private final double BASE_SPEED = 1000, FAST_SPEED = 0.05;
+	private final double SPEED_RATE = 0.9;
+	
 	// VARIABLES
+	private double gameSpeed = BASE_SPEED;
 	private boolean gameOver = false;
 	private int score = 0;
-	private double gameSpeed = SLOW_SPEED;
 
 	// OBJECT REFERENCES
 	private final Grid GRID;;
@@ -24,6 +25,10 @@ public class Game {
 		GRID = new Grid( this);
 	}
 
+	public String getGameContent() {
+		return GRID.printGrid();
+	}
+	
 	// RETURN GAME STATE
 	public boolean isGameOver() {
 		return gameOver;
@@ -37,6 +42,14 @@ public class Game {
 	// ADDS POINTS TO THE SCORE
 	public void addScore( int points ) {
 		score += points;
+		gameSpeed = calculateSpeed(false);
+	}
+	
+	public double calculateSpeed(boolean accelerate) {
+		double speed = BASE_SPEED * Math.pow(SPEED_RATE, score);;
+		if(accelerate)
+		speed *= FAST_SPEED;
+		return speed;
 	}
 
 	// STARTS THE GAME
@@ -49,10 +62,15 @@ public class Game {
 		frame.setLocationRelativeTo( null );
 		
 		frame.addKeyListener( new GameInput(this) );
+		frame.setVisible( false );
+		frame.setVisible( true );
 		play();
 		
 		gameOver = true;
 		frame.remove(panel);
+		
+		frame.revalidate();
+		
 	}
 
 	// RUNS THE GAME
@@ -150,9 +168,9 @@ public class Game {
 		
 		// SPEED INPUT
 		if ( input == GameInput.INPUT_TYPE.SLOWDOWN ) {
-			gameSpeed = SLOW_SPEED;
+			gameSpeed = calculateSpeed(false);
 		} else if ( input == GameInput.INPUT_TYPE.SPEEDUP ) {
-			gameSpeed = FAST_SPEED;
+			gameSpeed = calculateSpeed(true);
 		}
 		
 		// QUIT
