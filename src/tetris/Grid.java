@@ -1,6 +1,5 @@
 package tetris;
 
-
 public class Grid {
 
 	// OBJECT REFERENCES
@@ -26,29 +25,10 @@ public class Grid {
 		Cell[][] cells = new Cell[WIDTH][HEIGHT];
 		for ( int x = 0; x < WIDTH; x++ ) {
 			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY );
+				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY);
 			}
 		}
 		return cells;
-	}
-
-	// RETURNS A HTML STRING WITH THE GAMEFIELD
-	public String printGrid() {
-
-		// ADDS CELLS
-		String game = "";
-		for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-			for ( int x = 0; x < WIDTH; x++ ) {
-
-				game += getCells()[x][y].getStateChar();
-			}
-			game += "<br/>";
-		}
-
-		// ADDS EXTRA TEXT
-		game = String.format( "<html><h1>Score: %d</h1><h2>%s</h2></html>", GAME.getScore(), game );
-		
-		return game;
 	}
 
 	// RETURNS ALL ACTIVE CELLS ON FIELD
@@ -164,7 +144,7 @@ public class Grid {
 					isLineFull = false;
 				}
 			}
-			// CLEARS THE FILLED LINE
+			// CLEARS THE FULL LINE
 			if ( isLineFull ) {
 				
 				GAME.addScore( 1 );
@@ -189,7 +169,6 @@ public class Grid {
 		for ( int i = 0; i < WIDTH; i++ ) {
 			if ( this.getCells()[i][HEIGHT - 1].getState() == Cell.STATE.FULL ) {
 				dead = true;
-				System.out.println( "Game Over" );
 			}
 		}
 		return dead;

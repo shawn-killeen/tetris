@@ -1,6 +1,8 @@
 package tetris;
 
 
+import java.awt.*;
+import java.io.*;
 import javax.swing.*;
 
 public class Game {
@@ -16,17 +18,10 @@ public class Game {
 
 	// OBJECT REFERENCES
 	private final Grid GRID;;
-	
-	// SWING
-	private JLabel gameContent = new JLabel("");
 
 	// CONSTRUCTOR
-	public Game() {
+	public Game(JFrame frame) throws IOException {
 		GRID = new Grid( this);
-	}
-
-	public String getGameContent() {
-		return GRID.printGrid();
 	}
 	
 	// RETURN GAME STATE
@@ -53,18 +48,19 @@ public class Game {
 	}
 
 	// STARTS THE GAME
-	public void start(JFrame frame) {
-		gameContent = new JLabel("");
+	public void start(JFrame frame) throws IOException {
 		JPanel panel = new JPanel();
-		panel.add( gameContent );
+		panel = new JPanel();
 		frame.add( panel );
-		frame.setSize( 300, 750 );
+		frame.setSize( 200, 750 );
 		frame.setLocationRelativeTo( null );
 		
 		frame.addKeyListener( new GameInput(this) );
 		frame.setVisible( false );
 		frame.setVisible( true );
-		play();
+		createGamePanel(frame, panel);
+		frame.revalidate();
+		play(frame);
 		
 		gameOver = true;
 		frame.remove(panel);
@@ -74,7 +70,7 @@ public class Game {
 	}
 
 	// RUNS THE GAME
-	private void play() {
+	private void play(JFrame frame) throws IOException {
 		double lastTime = gameSpeed;
 
 		while ( !gameOver ) {
@@ -105,12 +101,29 @@ public class Game {
 				GRID.clearLines();
 				gameOver = GRID.isDead();
 			}
-
-			// UPDATES DISPLAY
-			gameContent.setText( GRID.printGrid() );
 		}
 	}
 
+	private void createGamePanel(JFrame frame, JPanel panel)throws IOException {
+		Cell[][] cells = GRID.getCells();;
+	
+		panel.setLayout(new GridBagLayout());
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(1, 1, 1, 1);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        
+        gbc.fill = GridBagConstraints.BOTH;
+        for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
+            gbc.gridy = Grid.HEIGHT-y;
+            for ( int x = 0; x <  Grid.WIDTH; x++ ) {
+                gbc.gridx = x;
+                panel.add(cells[x][y], gbc);
+            }
+        }
+	}
+	
 	private void gravity() {
 
 		// MAKES SURE A SHAPE EXISTS
@@ -176,7 +189,6 @@ public class Game {
 		// QUIT
 		if ( input == GameInput.INPUT_TYPE.QUIT ) {
 			gameOver = true;
-			System.out.println( "INPUTTTTT" );
 		}
 
 	}

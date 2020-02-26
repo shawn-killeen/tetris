@@ -2,6 +2,7 @@ package tetris;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -36,6 +37,10 @@ public class WindowManager {
 				input = ( (Integer) ( (JButton) arg0.getSource() ).getClientProperty( "index" ) );
 			}
 		} );
+	}
+	
+	public JFrame getFrame() {
+		return frame;
 	}
 
 	// Shows menu and return button input
@@ -93,7 +98,7 @@ public class WindowManager {
 	}
 
 	// Starts game
-	public MENU_ACTION showGame( Game game ) {
+	public MENU_ACTION showGame( Game game ) throws IOException {
 		game.start( frame );
 		return MENU_ACTION.MENU;
 	}
