@@ -12,41 +12,61 @@ public class Cell extends JPanel {
 		EMPTY, ACTIVE, FULL;
 	}
 
-	private static final Color COLOR_EMPTY = Color.WHITE;
-	private static final Color COLOR_ACTIVE = Color.DARK_GRAY;
-	private static final Color COLOR_FULL = Color.BLACK;
+	private static final Color COLOR_EMPTY = Color.LIGHT_GRAY;
+	private Color colorFull = Color.BLACK;
 	private final Coord COORDINATES;
 
 	private STATE state;
-
-	public Cell( int x, int y, STATE state){
-		this.state = state;
+	
+	public Cell( int x, int y, STATE state, Color fullColor){
+		setStateColor(state, fullColor);
 		COORDINATES = new Coord( x, y );
-		setBackground(COLOR_EMPTY);
+		
+	}
+	
+	public Cell( int x, int y, STATE state){
+		setStateColor(state, colorFull);
+		COORDINATES = new Coord( x, y );
+		
 	}
 
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(20, 20);
     }
-
-	public void setState( STATE newState ) {
-		state = newState;
+	
+	public void setStateColor(STATE state, Color color) {
+		setState(state);
+		setColor(color);
+	}
+	
+	public void setColor(Color color) {
+		this.colorFull = color;
+		updateColor();
+	}
+	
+	public Color getColor() {
+		return colorFull;
+	}
+	
+	public void setState(STATE state) {
+		this.state = state;
+		updateColor();
+	}
+	
+	public void updateColor() {
 		switch ( state ) {
 		case EMPTY:
 			setBackground(COLOR_EMPTY);
 			break;
-		case ACTIVE:
-			setBackground(COLOR_ACTIVE);
-			break;
 		case FULL:
-			setBackground(COLOR_FULL);
+			setBackground(colorFull);
 			break;
-		default:
-			setBackground(Color.BLUE);
+		case ACTIVE:
+			setBackground(colorFull);
 		}
 	}
-
+	
 	public STATE getState() {
 
 		return state;

@@ -1,5 +1,7 @@
 package tetris;
 
+import java.awt.Color;
+
 public class Grid {
 
 	// OBJECT REFERENCES
@@ -25,7 +27,7 @@ public class Grid {
 		Cell[][] cells = new Cell[WIDTH][HEIGHT];
 		for ( int x = 0; x < WIDTH; x++ ) {
 			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY);
+				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY, Color.BLACK);
 			}
 		}
 		return cells;
@@ -56,9 +58,71 @@ public class Grid {
 		}
 		return activeCells;
 	}
+	
+	public void spawnShape() {
+		if (findActiveCells().length == 0 ) {
+
+			// VARIABLES
+			Shape shape = Shape.randomShape();
+			int height = Coord.calculateHeight( shape.getCoords() );
+			int width = Coord.calculateWidth( shape.getCoords() );
+			int middle = ( WIDTH - width ) / 2;
+
+			// PLACES CELLS ON GRID
+			for ( int i = 0; i < shape.getCoords().length; i++ ) {
+				Cell temp = getCells()[middle + shape.getCoords()[i].getX()][( Grid.HEIGHT )
+						- ( height - shape.getCoords()[i].getY() )];
+
+				temp.setStateColor( Cell.STATE.ACTIVE, shape.getColor());
+			}
+		}
+	}
+	
+	public void gravity() {
+
+		// MAKES SURE A SHAPE EXISTS
+		Coord[] activeCells = findActiveCells();
+		if ( activeCells.length > 0 ) {
+
+			boolean isUnderneathClear = true;
+
+			// CHECK IF AT LEAST ONE CELL IS TOUCHING FULL
+			for ( int i = 0; i < activeCells.length; i++ ) {
+
+				// LINES THAT ARENT THE LAST
+				if ( activeCells[i].getY() != 0 ) {
+
+					// IF TOUCHES
+					Cell cellUnder = getCells()[activeCells[i].getX()][activeCells[i].getY() - 1];
+					if ( cellUnder.getState() == Cell.STATE.FULL ) {
+						isUnderneathClear = false;
+					}
+
+					// LAST LINE
+				} else {
+					isUnderneathClear = false;
+				}
+			}
+
+			// LOWERS CELLS
+			if ( isUnderneathClear ) {
+				moveCells( activeCells, 0, -1 );
+			}
+			// GROUNDS CELLS
+			else {
+				for ( int i = 0; i < activeCells.length; i++ ) {
+					Cell temp = getCells()[activeCells[i].getX()][activeCells[i].getY()];
+					temp.setState( Cell.STATE.FULL);
+
+				}
+			}
+		}
+	}
 
 	// MOVE A GROUP OF CELLS
 	public void moveCells( Coord[] coords, int deltaX, int deltaY ) {
+		
+		Color color = Color.BLACK;
 		
 		// VARIABLES
 		Coord[] activeCoords = this.findActiveCells();
@@ -78,7 +142,9 @@ public class Grid {
 		if ( valid ) {
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
-				this.getCells()[coord.getX()][coord.getY()].setState( Cell.STATE.EMPTY );
+				Cell temp = getCells()[coord.getX()][coord.getY()];
+				color = temp.getColor();
+				temp.setState( Cell.STATE.EMPTY);
 
 			}
 
@@ -86,8 +152,9 @@ public class Grid {
 			for ( int i = 0; i < coords.length; i++ ) {
 				Coord coord = coords[i];
 
-				if ( this.getCells()[coord.getX()][coord.getY()].getState() == Cell.STATE.EMPTY ) {
-					this.getCells()[coord.getX()][coord.getY()].setState( Cell.STATE.ACTIVE );
+				if ( getCells()[coord.getX()][coord.getY()].getState() == Cell.STATE.EMPTY ) {
+					Cell temp = getCells()[coord.getX()][coord.getY()];
+					temp.setStateColor( Cell.STATE.ACTIVE, color );
 				}
 			}
 		}
@@ -149,13 +216,13 @@ public class Grid {
 				
 				GAME.addScore( 1 );
 				for ( int x = 0; x < WIDTH; x++ ) {
-					this.getCells()[x][y].setState( Cell.STATE.EMPTY );
+					this.getCells()[x][y].setState( Cell.STATE.EMPTY);
 				}
 				// DROPS THE LINES
 				for ( int i = y; i < HEIGHT - 1; i++ ) {
 					for ( int x = 0; x < WIDTH; x++ ) {
-						this.getCells()[x][i].setState( this.getCells()[x][i + 1].getState() );
-						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY );
+						this.getCells()[x][i].setStateColor( this.getCells()[x][i + 1].getState(), this.getCells()[x][i + 1].getColor() );
+						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY);
 					}
 				}
 			}

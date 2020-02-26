@@ -50,15 +50,25 @@ public class Game {
 	// STARTS THE GAME
 	public void start(JFrame frame) throws IOException {
 		JPanel panel = new JPanel();
-		panel = new JPanel();
+		JPanel scorePanel = new JPanel();
+		JPanel gamePanel = new JPanel();
+		JLabel scoreboard = new JLabel("Test");
+		scorePanel.add( scoreboard);
+		scorePanel.setPreferredSize( new Dimension(210, 25) );
+		gamePanel.setPreferredSize( new Dimension(210, 810) );
+		
+		panel.setLayout( new BoxLayout(panel, BoxLayout.Y_AXIS) );
+		
+		panel.add(scorePanel);
+		panel.add(gamePanel);
 		frame.add( panel );
-		frame.setSize( 200, 750 );
+		frame.setSize( 210, 835 );
 		frame.setLocationRelativeTo( null );
 		
 		frame.addKeyListener( new GameInput(this) );
 		frame.setVisible( false );
 		frame.setVisible( true );
-		createGamePanel(frame, panel);
+		createGamePanel(frame, gamePanel);
 		frame.revalidate();
 		play(frame);
 		
@@ -79,25 +89,8 @@ public class Game {
 				lastTime = System.currentTimeMillis();
 
 				// SPAWNS SHAPE WHEN NONE IS PRESENT
-				if ( GRID.findActiveCells().length == 0 ) {
-
-					// VARIABLES
-					Coord[] shape = Coord.randomShape();
-					int height = Coord.calculateHeight( shape );
-					int width = Coord.calculateWidth( shape );
-					int middle = ( Grid.WIDTH - width ) / 2;
-
-					// PLACES CELLS ON GRID
-					for ( int i = 0; i < shape.length; i++ ) {
-						Cell temp = GRID.getCells()[middle + shape[i].getX()][( Grid.HEIGHT )
-								- ( height - shape[i].getY() )];
-
-						temp.setState( Cell.STATE.ACTIVE );
-					}
-				}
-
-				// RUN METHODS
-				gravity();
+				GRID.spawnShape();
+				GRID.gravity();
 				GRID.clearLines();
 				gameOver = GRID.isDead();
 			}
@@ -122,46 +115,6 @@ public class Game {
                 panel.add(cells[x][y], gbc);
             }
         }
-	}
-	
-	private void gravity() {
-
-		// MAKES SURE A SHAPE EXISTS
-		Coord[] activeCells = GRID.findActiveCells();
-		if ( activeCells.length > 0 ) {
-
-			boolean isUnderneathClear = true;
-
-			// CHECK IF AT LEAST ONE CELL IS TOUCHING FULL
-			for ( int i = 0; i < activeCells.length; i++ ) {
-
-				// LINES THAT ARENT THE LAST
-				if ( activeCells[i].getY() != 0 ) {
-
-					// IF TOUCHES
-					Cell cellUnder = GRID.getCells()[activeCells[i].getX()][activeCells[i].getY() - 1];
-					if ( cellUnder.getState() == Cell.STATE.FULL ) {
-						isUnderneathClear = false;
-					}
-
-					// LAST LINE
-				} else {
-					isUnderneathClear = false;
-				}
-			}
-
-			// LOWERS CELLS
-			if ( isUnderneathClear ) {
-				GRID.moveCells( activeCells, 0, -1 );
-			}
-			// GROUNDS CELLS
-			else {
-				for ( int i = 0; i < activeCells.length; i++ ) {
-					GRID.getCells()[activeCells[i].getX()][activeCells[i].getY()].setState( Cell.STATE.FULL );
-
-				}
-			}
-		}
 	}
 
 	public void input( GameInput.INPUT_TYPE input ) {
