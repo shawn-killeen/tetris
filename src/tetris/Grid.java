@@ -14,50 +14,46 @@ public class Grid {
 
 	// CONSTANTS
 	public static final int WIDTH = 10, HEIGHT = 24;
-	private Cell[][] cells;
 	private  STATE[][] states = new STATE[WIDTH][HEIGHT];
 
 	// CONTRUCTOR
 	public Grid( Game game ) {
 		myGame = game;
-		cells = generateField();
+		generateField();
 	}
 
-	// RETURNS CELLS
-	public Cell[][] getCells() {
-		return cells;
-	}
 
 	// CREATES GRID
-	private Cell[][] generateField() {
-		Cell[][] cells = new Cell[WIDTH][HEIGHT];
-		for ( int x = 0; x < WIDTH; x++ ) {
-			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-				cells[x][y] = new Cell( x, y );
+	private void generateField() {
+		for ( int x = 0; x < states.length; x++ ) {
+			for ( int y = states[x].length - 1; y >= 0; y-- ) {
+				states[x][y] = STATE.EMPTY;
 			}
 		}
-		return cells;
+	}
+	
+	public STATE[][] getStates(){
+		return states;
 	}
 
 	// RETURNS ALL ACTIVE CELLS ON FIELD
 	public ArrayList<Coord> findActiveCells() {
 
 		// VARIABLES
-		Cell[][] cells = this.getCells();
-		ArrayList<Coord> activeCells = new ArrayList<Coord>();
+		ArrayList<Coord> activeCoords = new ArrayList<Coord>();
 
 		// FOR EACH CELL
-		for ( int x = 0; x < cells.length; x++ ) {
-			for ( int y = 0; y < cells[x].length; y++ ) {
+		for ( int x = 0; x < states.length; x++ ) {
+			for ( int y = 0; y < states[x].length; y++ ) {
 
 				// CHECK IF ACTIVE
-				if ( cells[x][y].getState() == Cell.STATE.ACTIVE ) {
+				if ( states[x][y] == STATE.ACTIVE ) {
 					// ADD CELL
-					activeCells.add( new Coord( x, y ) );
+					activeCoords.add( new Coord( x, y ) );
 				}
 			}
 		}
-		return activeCells;
+		return activeCoords;
 	}
 
 	public void spawnShape() {
@@ -71,11 +67,10 @@ public class Grid {
 
 			// PLACES CELLS ON GRID
 			for ( int i = 0; i < shape.getCoords().length; i++ ) {
-				int cellX = middle + shape.getCoords()[i].getX();
-				int cellY = ( Grid.HEIGHT ) - ( height - shape.getCoords()[i].getY() );
-				Cell temp = getCells()[cellX][cellY];
-				temp.setColorWhenFull( shape.getColor() );
-				temp.setState( Cell.STATE.ACTIVE );
+				int x = middle + shape.getCoords()[i].getX();
+				int y = ( Grid.HEIGHT ) - ( height - shape.getCoords()[i].getY() );
+				//temp.setColorWhenFull( shape.getColor() );
+				states[x][y] = STATE.ACTIVE;
 			}
 		}
 	}
@@ -95,8 +90,8 @@ public class Grid {
 				if ( activeCell.getY() != 0 ) {
 
 					// IF TOUCHES
-					Cell cellUnder = getCells()[activeCell.getX()][activeCell.getY() - 1];
-					if ( cellUnder.getState() == Cell.STATE.FULL ) {
+					STATE cellUnder = states[activeCell.getX()][activeCell.getY() - 1];
+					if ( cellUnder == STATE.FULL ) {
 						isUnderneathClear = false;
 					}
 
@@ -108,14 +103,13 @@ public class Grid {
 
 			// LOWERS CELLS
 			if ( isUnderneathClear ) {
+				System.out.println( "LOWERS" );
 				moveCells( activeCells, 0, -1 );
 			}
 			// GROUNDS CELLS
 			else {
 				for ( int i = 0; i < activeCells.size(); i++ ) {
-					Cell cell = getCells()[activeCells.get( i ).getX()][activeCells.get( i ).getY()];
-					cell.setState( Cell.STATE.FULL );
-
+					states[activeCells.get( i ).getX()][activeCells.get( i ).getY()] = STATE.FULL;
 				}
 			}
 		}
@@ -133,30 +127,28 @@ public class Grid {
 			coords.set( i, new Coord( coords.get( i ).getX() + deltaX, coords.get( i ).getY() + deltaY ) );
 			if ( !Coord.isInLimits( coords.get( i ), WIDTH, HEIGHT ) ) {
 				valid = false;
-			} else if ( this.getCells()[coords.get( i ).getX()][coords.get( i ).getY()]
-					.getState() == Cell.STATE.FULL ) {
+			} else if ( states[coords.get( i ).getX()][coords.get( i ).getY()]
+					 == STATE.FULL ) {
 				valid = false;
 			}
 		}
 		// CHECK NEW POSITION WAS OCCUPIED
 		if ( valid ) {
-			Color goodColor = Cell.COLOR_FULL;
+			//Color goodColor = Color.BLACK;
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
-				Cell temp = getCells()[coord.getX()][coord.getY()];
-				temp.setState( Cell.STATE.EMPTY );
-				goodColor = temp.getColorWhenFull();
-
+				states[coord.getX()][coord.getY()]= STATE.EMPTY;
+				//goodColor = temp.getColorWhenFull();
+				
 			}
 
 			// NEW ACTIVE
 			for ( int i = 0; i < coords.size(); i++ ) {
 				Coord coord = coords.get( i );
 
-				if ( getCells()[coord.getX()][coord.getY()].getState() == Cell.STATE.EMPTY ) {
-					Cell temp = getCells()[coord.getX()][coord.getY()];
-					temp.setColorWhenFull( goodColor );
-					temp.setState( Cell.STATE.ACTIVE );
+				if ( states[coord.getX()][coord.getY()] == STATE.EMPTY ) {
+					states[coord.getX()][coord.getY()]= STATE.ACTIVE ;
+					//temp.setColorWhenFull( goodColor );
 				}
 			}
 		}
@@ -211,7 +203,7 @@ public class Grid {
 		for ( int y = 0; y < HEIGHT; y++ ) {
 			boolean isLineFull = true;
 			for ( int x = 0; x < WIDTH; x++ ) {
-				if ( this.getCells()[x][y].getState() != Cell.STATE.FULL ) {
+				if ( states[x][y] !=STATE.FULL ) {
 					isLineFull = false;
 				}
 			}
@@ -220,13 +212,13 @@ public class Grid {
 
 				myGame.addScore( 1 );
 				for ( int x = 0; x < WIDTH; x++ ) {
-					this.getCells()[x][y].setState( Cell.STATE.EMPTY );
+					states[x][y] = STATE.EMPTY ;
 				}
 				// DROPS THE LINES
 				for ( int i = y; i < HEIGHT - 1; i++ ) {
 					for ( int x = 0; x < WIDTH; x++ ) {
-						this.getCells()[x][i].setState( this.getCells()[x][i + 1].getState() );
-						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY );
+						states[x][i] = states[x][i + 1];
+						states[x][i + 1] = STATE.EMPTY ;
 					}
 				}
 			}
@@ -238,7 +230,7 @@ public class Grid {
 	public boolean isDead() {
 		boolean dead = false;
 		for ( int i = 0; i < WIDTH; i++ ) {
-			if ( this.getCells()[i][HEIGHT - 1].getState() == Cell.STATE.FULL ) {
+			if ( states[i][HEIGHT - 1] == STATE.FULL ) {
 				dead = true;
 			}
 		}

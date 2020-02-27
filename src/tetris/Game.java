@@ -18,6 +18,7 @@ public class Game extends JPanel{
 
 	// OBJECT REFERENCES
 	private final Grid GRID;
+	JPanel[][] cells = new JPanel[Grid.WIDTH][Grid.HEIGHT];
 
 	// CONSTRUCTOR
 	public Game() {
@@ -84,11 +85,15 @@ public class Game extends JPanel{
 	
 	private void refreshGamePanel() {
 		
-		Cell[][] cells = GRID.getCells();
+		Grid.STATE[][] states = GRID.getStates();
 		
 		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
-				cells[x][y].setBackground(cells[x][y].getCorrectColor());
+				if(states[x][y] == Grid.STATE.EMPTY)
+				cells[x][y].setBackground( Color.GRAY );
+				
+				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
+				cells[x][y].setBackground( Color.BLACK );
 			}
 		}
 	}
@@ -96,8 +101,8 @@ public class Game extends JPanel{
 	private JPanel createGamePanel() {
 
 		JPanel panel = new JPanel();
-		Cell[][] cells = GRID.getCells();
-
+		Grid.STATE[][] states = GRID.getStates();
+		
 		panel.setPreferredSize( new Dimension( 210, 810 ) );
 		panel.setLayout( new GridBagLayout() );
 
@@ -111,6 +116,16 @@ public class Game extends JPanel{
 			gbc.gridy = Grid.HEIGHT - y;
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
 				gbc.gridx = x;
+				cells[x][y] = new JPanel();
+				
+				cells[x][y].setPreferredSize( new Dimension( 20, 20 ) );
+				
+				if(states[x][y] == Grid.STATE.EMPTY)
+				cells[x][y].setBackground( Color.GRAY );
+				
+				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
+				cells[x][y].setBackground( Color.BLACK );
+				
 				panel.add( cells[x][y], gbc );
 			}
 		}
