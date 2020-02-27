@@ -1,25 +1,31 @@
 package tetris;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 public class Grid {
 
 	// OBJECT REFERENCES
-	private final Game GAME;
+	private Game myGame;
+	
+	public static enum STATE {
+		EMPTY, ACTIVE, FULL;
+	}
 
-	//CONSTANTS
-	public static final int  WIDTH = 10, HEIGHT = 24;
-	private Cell[][] CELLS;
+	// CONSTANTS
+	public static final int WIDTH = 10, HEIGHT = 24;
+	private Cell[][] cells;
+	private  STATE[][] states = new STATE[WIDTH][HEIGHT];
 
 	// CONTRUCTOR
-	public Grid( Game game) {
-		GAME = game;
-		CELLS = generateField();
+	public Grid( Game game ) {
+		myGame = game;
+		cells = generateField();
 	}
 
 	// RETURNS CELLS
 	public Cell[][] getCells() {
-		return CELLS;
+		return cells;
 	}
 
 	// CREATES GRID
@@ -27,40 +33,35 @@ public class Grid {
 		Cell[][] cells = new Cell[WIDTH][HEIGHT];
 		for ( int x = 0; x < WIDTH; x++ ) {
 			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY);
+				cells[x][y] = new Cell( x, y );
 			}
 		}
 		return cells;
 	}
 
 	// RETURNS ALL ACTIVE CELLS ON FIELD
-	public Coord[] findActiveCells() {
-		
+	public ArrayList<Coord> findActiveCells() {
+
 		// VARIABLES
 		Cell[][] cells = this.getCells();
-		Coord[] activeCells = new Coord[0];
-		
+		ArrayList<Coord> activeCells = new ArrayList<Coord>();
+
 		// FOR EACH CELL
 		for ( int x = 0; x < cells.length; x++ ) {
 			for ( int y = 0; y < cells[x].length; y++ ) {
-				
+
 				// CHECK IF ACTIVE
 				if ( cells[x][y].getState() == Cell.STATE.ACTIVE ) {
-					
-					// MAKES ARRAY FIT THE NUMBER OF CELLS
-					Coord[] temp = activeCells.clone();
-					activeCells = new Coord[activeCells.length + 1];
-					System.arraycopy( temp, 0, activeCells, 0, temp.length );
 					// ADD CELL
-					activeCells[activeCells.length - 1] = new Coord( x, y );
+					activeCells.add( new Coord( x, y ) );
 				}
 			}
 		}
 		return activeCells;
 	}
-	
+
 	public void spawnShape() {
-		if (findActiveCells().length == 0 ) {
+		if ( findActiveCells().size() == 0 ) {
 
 			// VARIABLES
 			Shape shape = Shape.randomShape();
@@ -70,30 +71,31 @@ public class Grid {
 
 			// PLACES CELLS ON GRID
 			for ( int i = 0; i < shape.getCoords().length; i++ ) {
-				Cell temp = getCells()[middle + shape.getCoords()[i].getX()][( Grid.HEIGHT )
-						- ( height - shape.getCoords()[i].getY() )];
-
-				temp.setState( Cell.STATE.ACTIVE);
+				int cellX = middle + shape.getCoords()[i].getX();
+				int cellY = ( Grid.HEIGHT ) - ( height - shape.getCoords()[i].getY() );
+				Cell temp = getCells()[cellX][cellY];
+				temp.setColorWhenFull( shape.getColor() );
+				temp.setState( Cell.STATE.ACTIVE );
 			}
 		}
 	}
-	
+
 	public void gravity() {
 
 		// MAKES SURE A SHAPE EXISTS
-		Coord[] activeCells = findActiveCells();
-		if ( activeCells.length > 0 ) {
+		ArrayList<Coord> activeCells = findActiveCells();
+		if ( activeCells.size() > 0 ) {
 
 			boolean isUnderneathClear = true;
 
 			// CHECK IF AT LEAST ONE CELL IS TOUCHING FULL
-			for ( int i = 0; i < activeCells.length; i++ ) {
-
+			for ( int i = 0; i < activeCells.size(); i++ ) {
+				Coord activeCell = activeCells.get( i );
 				// LINES THAT ARENT THE LAST
-				if ( activeCells[i].getY() != 0 ) {
+				if ( activeCell.getY() != 0 ) {
 
 					// IF TOUCHES
-					Cell cellUnder = getCells()[activeCells[i].getX()][activeCells[i].getY() - 1];
+					Cell cellUnder = getCells()[activeCell.getX()][activeCell.getY() - 1];
 					if ( cellUnder.getState() == Cell.STATE.FULL ) {
 						isUnderneathClear = false;
 					}
@@ -110,9 +112,9 @@ public class Grid {
 			}
 			// GROUNDS CELLS
 			else {
-				for ( int i = 0; i < activeCells.length; i++ ) {
-					Cell temp = getCells()[activeCells[i].getX()][activeCells[i].getY()];
-					temp.setState( Cell.STATE.FULL);
+				for ( int i = 0; i < activeCells.size(); i++ ) {
+					Cell cell = getCells()[activeCells.get( i ).getX()][activeCells.get( i ).getY()];
+					cell.setState( Cell.STATE.FULL );
 
 				}
 			}
@@ -120,37 +122,40 @@ public class Grid {
 	}
 
 	// MOVE A GROUP OF CELLS
-	public void moveCells( Coord[] coords, int deltaX, int deltaY ) {
-		
+	public void moveCells( ArrayList<Coord> coords, int deltaX, int deltaY ) {
+
 		// VARIABLES
-		Coord[] activeCoords = this.findActiveCells();
+		ArrayList<Coord> activeCoords = this.findActiveCells();
 		boolean valid = true;
 
 		// CALCULATE NEW COORDS & CHECK VALID
-		for ( int i = 0; i < coords.length; i++ ) {
-			coords[i] = new Coord( coords[i].getX() + deltaX, coords[i].getY() + deltaY );
-			// coord.setY( coord.getY() + deltaY );
-			if ( !Coord.isInLimits( coords[i], WIDTH, HEIGHT ) ) {
+		for ( int i = 0; i < coords.size(); i++ ) {
+			coords.set( i, new Coord( coords.get( i ).getX() + deltaX, coords.get( i ).getY() + deltaY ) );
+			if ( !Coord.isInLimits( coords.get( i ), WIDTH, HEIGHT ) ) {
 				valid = false;
-			} else if ( this.getCells()[coords[i].getX()][coords[i].getY()].getState() == Cell.STATE.FULL ) {
+			} else if ( this.getCells()[coords.get( i ).getX()][coords.get( i ).getY()]
+					.getState() == Cell.STATE.FULL ) {
 				valid = false;
 			}
 		}
 		// CHECK NEW POSITION WAS OCCUPIED
 		if ( valid ) {
+			Color goodColor = Cell.COLOR_FULL;
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
 				Cell temp = getCells()[coord.getX()][coord.getY()];
-				temp.setState( Cell.STATE.EMPTY);
+				temp.setState( Cell.STATE.EMPTY );
+				goodColor = temp.getColorWhenFull();
 
 			}
 
 			// NEW ACTIVE
-			for ( int i = 0; i < coords.length; i++ ) {
-				Coord coord = coords[i];
+			for ( int i = 0; i < coords.size(); i++ ) {
+				Coord coord = coords.get( i );
 
 				if ( getCells()[coord.getX()][coord.getY()].getState() == Cell.STATE.EMPTY ) {
 					Cell temp = getCells()[coord.getX()][coord.getY()];
+					temp.setColorWhenFull( goodColor );
 					temp.setState( Cell.STATE.ACTIVE );
 				}
 			}
@@ -158,40 +163,42 @@ public class Grid {
 	}
 
 	// ROTATE A GROUP OF CELLS
-	public void rotateCells( Coord[] coords ) {
-		
+	public void rotateCells( ArrayList<Coord> coords ) {
+
 		// VARIABLES
 		Coord bottomLeft = new Coord( 200, 200 );
 		Coord[] relative;
 
 		// BOTTOM-LEFT COORDINATES
-		for ( int i = 0; i < coords.length; i++ ) {
-			if ( coords[i].getX() < bottomLeft.getX() ) {
-				bottomLeft = new Coord( coords[i].getX(), bottomLeft.getY() );
+		for ( int i = 0; i < coords.size(); i++ ) {
+			if ( coords.get( i ).getX() < bottomLeft.getX() ) {
+				bottomLeft = new Coord( coords.get( i ).getX(), bottomLeft.getY() );
 			}
-			if ( coords[i].getY() < bottomLeft.getY() ) {
-				bottomLeft = new Coord( bottomLeft.getX(), coords[i].getY() );
+			if ( coords.get( i ).getY() < bottomLeft.getY() ) {
+				bottomLeft = new Coord( bottomLeft.getX(), coords.get( i ).getY() );
 			}
 		}
 
 		// RELATIVE COORDINATES
-		relative = new Coord[coords.length];
+		relative = new Coord[coords.size()];
 		for ( int i = 0; i < relative.length; i++ ) {
-			relative[i] = new Coord( coords[i].getX() - bottomLeft.getX(), coords[i].getY() - bottomLeft.getY() );
+			relative[i] = new Coord( coords.get( i ).getX() - bottomLeft.getX(),
+					coords.get( i ).getY() - bottomLeft.getY() );
 		}
 
 		// FIND WIDTH
 		int shapeWidth = Coord.calculateWidth( relative );
 
 		// ROTATE AND FLIP COORDINATES
-		for ( int i = 0; i < coords.length; i++ ) {
+		for ( int i = 0; i < coords.size(); i++ ) {
 			Coord[] temp = relative;
 			relative[i] = new Coord( temp[i].getY(), ( shapeWidth - 1 ) - temp[i].getX() );
 		}
 
 		// GLOBAL COORDINATES
-		for ( int i = 0; i < coords.length; i++ ) {
-			coords[i] = new Coord( bottomLeft.getX() + relative[i].getX(), bottomLeft.getY() + relative[i].getY() );
+		for ( int i = 0; i < coords.size(); i++ ) {
+			coords.set( i,
+					new Coord( bottomLeft.getX() + relative[i].getX(), bottomLeft.getY() + relative[i].getY() ) );
 		}
 
 		moveCells( coords, 0, 0 );
@@ -199,7 +206,7 @@ public class Grid {
 
 	// UPDATES LINES
 	public void clearLines() {
-		
+
 		// CHECKS IF LINES ARE FULL
 		for ( int y = 0; y < HEIGHT; y++ ) {
 			boolean isLineFull = true;
@@ -210,16 +217,16 @@ public class Grid {
 			}
 			// CLEARS THE FULL LINE
 			if ( isLineFull ) {
-				
-				GAME.addScore( 1 );
+
+				myGame.addScore( 1 );
 				for ( int x = 0; x < WIDTH; x++ ) {
-					this.getCells()[x][y].setState( Cell.STATE.EMPTY);
+					this.getCells()[x][y].setState( Cell.STATE.EMPTY );
 				}
 				// DROPS THE LINES
 				for ( int i = y; i < HEIGHT - 1; i++ ) {
 					for ( int x = 0; x < WIDTH; x++ ) {
 						this.getCells()[x][i].setState( this.getCells()[x][i + 1].getState() );
-						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY);
+						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY );
 					}
 				}
 			}

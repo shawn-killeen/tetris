@@ -1,9 +1,11 @@
 package tetris;
 
 import java.awt.*;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
-public class Game extends JPanel {
+public class Game extends JPanel{
 
 	// CONSTANTS
 	private final double BASE_SPEED = 1000, FAST_SPEED = 0.05;
@@ -15,18 +17,17 @@ public class Game extends JPanel {
 	private int score = 0;
 
 	// OBJECT REFERENCES
-	private final Grid GRID;;
+	private final Grid GRID;
 
 	// CONSTRUCTOR
 	public Game() {
 		GRID = new Grid( this );
 
 		JPanel gamePanel = createGamePanel();
-
-		add( gamePanel );
-
-		revalidate();
+		add(gamePanel);
+		
 		repaint();
+		revalidate();
 
 	}
 
@@ -64,6 +65,7 @@ public class Game extends JPanel {
 		addKeyListener( new GameInput(this) );
 
 		while ( !gameOver ) {
+			refreshGamePanel();
 			// CONTROLS CYCLE SPEED
 			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
 				lastTime = System.currentTimeMillis();
@@ -78,6 +80,17 @@ public class Game extends JPanel {
 			}
 		}
 		System.out.println( "GAMEOVER" );
+	}
+	
+	private void refreshGamePanel() {
+		
+		Cell[][] cells = GRID.getCells();
+		
+		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
+			for ( int x = 0; x < Grid.WIDTH; x++ ) {
+				cells[x][y].setBackground(cells[x][y].getCorrectColor());
+			}
+		}
 	}
 
 	private JPanel createGamePanel() {
@@ -106,10 +119,10 @@ public class Game extends JPanel {
 
 	public void input( GameInput.INPUT_TYPE input ) {
 
-		Coord[] activeCells = GRID.findActiveCells();
+		ArrayList<Coord> activeCells = GRID.findActiveCells();
 
 		// MOVEMENT INPUT
-		if ( activeCells.length > 0 ) {
+		if ( activeCells.size() > 0 ) {
 			if ( input == GameInput.INPUT_TYPE.LEFT ) {
 				GRID.moveCells( activeCells, -1, 0 );
 			} else if ( input == GameInput.INPUT_TYPE.RIGHT ) {

@@ -13,28 +13,42 @@ public class Cell extends JPanel {
 	}
 
 	public static final Color COLOR_EMPTY = Color.LIGHT_GRAY;
-	public static final Color COLOR_FULL = Color.BLUE;
+	public static final Color COLOR_FULL = Color.BLACK;
+	public Color fullColor;
 	private final Coord COORDINATES;
 
 	private STATE state;
 
-	public Cell( int x, int y, STATE state ) {
-		setState( state );
+	public Cell( int x, int y) {
+		this.fullColor = COLOR_FULL;
+		this.state = STATE.EMPTY;
+		setBackground( COLOR_EMPTY );
 		setPreferredSize( new Dimension( 20, 20 ) );
 		COORDINATES = new Coord( x, y );
 
 	}
-
+	
+	
+	public void setColorWhenFull(Color color) {
+		fullColor = color;
+	}
+	
+	public Color getColorWhenFull() {
+		return fullColor;
+	}
+	
 	public void setState( STATE state ) {
 		this.state = state;
-		switch ( state ) {
-		case EMPTY:
-			setBackground( COLOR_EMPTY );
-			break;
-		case FULL:
-		case ACTIVE:
-			setBackground( COLOR_FULL );
+	}
+	
+	public Color getCorrectColor() {
+		Color color = COLOR_EMPTY;
+		
+		if(state != STATE.EMPTY) {
+			color = fullColor;
 		}
+		
+		return color;
 	}
 
 	public STATE getState() {
