@@ -10,8 +10,6 @@ import javax.swing.border.BevelBorder;
 // Manages game instances and menus
 
 public class Main {
-	// TODO Remove menu, only one screen, one game, highscore
-	// TODO Spice-up UI
 
 	private static ArrayList<Integer> scores = new ArrayList<Integer>();
 
@@ -94,16 +92,19 @@ public class Main {
 		gbc.gridwidth = 1;
 		gbc.gridheight = 2;
 		globalPanel.add( gamePanel, gbc );
+		
 		gbc.gridx = 2;
 		gbc.gridy = 1;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		globalPanel.add( previewPanel, gbc );
+		
 		gbc.gridx = 2;
 		gbc.gridy = 2;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		globalPanel.add( textPanel, gbc );
+		
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.gridwidth = 2;

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
+@SuppressWarnings("serial")
 public class Game extends JPanel {
 
 	// CONSTANTS
@@ -85,21 +86,19 @@ public class Game extends JPanel {
 
 		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
-				
+
 				if ( states[x][y] == Grid.STATE.EMPTY ) {
-					if(cells[x][y].getBackground() != Grid.COLOR_EMPTY) {
-					cells[x][y].setBackground( Grid.COLOR_EMPTY );
-					cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
+					if ( cells[x][y].getBackground() != Grid.COLOR_EMPTY ) {
+						cells[x][y].setBackground( Grid.COLOR_EMPTY );
+						cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
 					}
 				}
 
 				if ( states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE ) {
 					cells[x][y].setBackground( colors[x][y] );
-					cells[x][y].setBorder( BorderFactory.createBevelBorder( BevelBorder.RAISED, colors[x][y].brighter().brighter(),
-							colors[x][y].darker().darker() ) );
+					cells[x][y].setBorder( BorderFactory.createBevelBorder( BevelBorder.RAISED,
+							colors[x][y].brighter().brighter(), colors[x][y].darker().darker() ) );
 				}
-
-				//cells[x][y].repaint();
 			}
 		}
 	}
@@ -107,7 +106,6 @@ public class Game extends JPanel {
 	private void createGamePanel() {
 
 		Grid.STATE[][] states = GRID.getStates();
-		Color[][] colors = GRID.getColors();
 
 		setLayout( new GridBagLayout() );
 
@@ -125,29 +123,23 @@ public class Game extends JPanel {
 
 				cells[x][y].setPreferredSize( new Dimension( 20, 20 ) );
 
-				if ( states[x][y] == Grid.STATE.EMPTY ) {
-					cells[x][y].setBackground( Grid.COLOR_EMPTY );
-				cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
-
-				}
 				add( cells[x][y], gbc );
 			}
 		}
-		;
 	}
 
 	public void input( GameInput.INPUT_TYPE input ) {
 
-		ArrayList<Coord> activeCells = GRID.findActiveCells();
+		ArrayList<Point> activePoints = GRID.findActivePoints();
 
 		// MOVEMENT INPUT
-		if ( activeCells.size() > 0 ) {
+		if ( activePoints.size() > 0 ) {
 			if ( input == GameInput.INPUT_TYPE.LEFT ) {
-				GRID.moveCells( activeCells, -1, 0 );
+				GRID.moveCells( activePoints, -1, 0 );
 			} else if ( input == GameInput.INPUT_TYPE.RIGHT ) {
-				GRID.moveCells( activeCells, 1, 0 );
+				GRID.moveCells( activePoints, 1, 0 );
 			} else if ( input == GameInput.INPUT_TYPE.TURN ) {
-				GRID.rotateCells( activeCells );
+				GRID.rotateCells( activePoints );
 			}
 		}
 

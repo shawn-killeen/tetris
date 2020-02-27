@@ -1,12 +1,12 @@
 package tetris;
 
-public final class Coord {
+public final class Point {
 
 	// CONSTANTS
 	private final int x, y;
 
 	// CONSTRUCTOR
-	public Coord( int x, int y ) {
+	public Point( int x, int y ) {
 		this.x = x;
 		this.y = y;
 	}
@@ -22,7 +22,7 @@ public final class Coord {
 	}
 
 	// RETURNS WIDTH OF AN ARRAY OF COORDINATES
-	public static int calculateWidth( Coord[] coords ) {
+	public static int calculateWidth( Point[] coords ) {
 		int width = 0;
 		for ( int i = 0; i < coords.length; i++ ) {
 			if ( coords[i].getX() + 1 > width )
@@ -32,7 +32,7 @@ public final class Coord {
 	}
 
 	// RETURNS HEIGHT OF AN ARRAY OF COORDINATES
-	public static int calculateHeight( Coord[] coords ) {
+	public static int calculateHeight( Point[] coords ) {
 		int height = 0;
 		for ( int i = 0; i < coords.length; i++ ) {
 			if ( coords[i].getY() + 1 > height )
@@ -42,12 +42,12 @@ public final class Coord {
 	}
 
 	// CHECKS IF COORDINATES ARE WITHIN THE BOARD
-	public static boolean isInLimits( Coord coord, int width, int height ) {
+	public static boolean isInLimits( Point point, int width, int height ) {
 		boolean isInLimits = true;
-		if ( coord.getX() < 0 || coord.getX() > width - 1 ) {
+		if ( point.getX() < 0 || point.getX() > width - 1 ) {
 			isInLimits = false;
 		}
-		if ( coord.getY() < 0 || coord.getY() > height - 1 ) {
+		if ( point.getY() < 0 || point.getY() > height - 1 ) {
 			isInLimits = false;
 		}
 		return isInLimits;
