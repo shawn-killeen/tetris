@@ -1,11 +1,10 @@
 package tetris;
 
-
 public final class Coord {
 
 	// CONSTANTS
 	private final int x, y;
-	
+
 	// CONSTRUCTOR
 	public Coord( int x, int y ) {
 		this.x = x;

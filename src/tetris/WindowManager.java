@@ -2,14 +2,11 @@ package tetris;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
 
-public class WindowManager {
-
-	private static JFrame frame;
+public class WindowManager extends JFrame {
 
 	public static enum MENU_ACTION {
 		MENU, PLAY, SCOREBOARD, QUIT
@@ -19,16 +16,15 @@ public class WindowManager {
 
 	// Creates new frame
 	public WindowManager() {
-		frame = new JFrame( "Tetris" );
-		frame.setResizable( false );
-		frame.setLocationRelativeTo( null );
+		setResizable( false );
+		setLocationRelativeTo( null );
 
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		frame.setVisible( true );
+		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		setVisible( true );
 	}
 
 	// Creates new button
-	private static void addButtonListener( JButton button, int index ) {
+	public static void addButtonListener( JButton button, int index ) {
 		button.putClientProperty( "index", index );
 		button.addActionListener( new ActionListener() {
 
@@ -38,9 +34,12 @@ public class WindowManager {
 			}
 		} );
 	}
-	
-	public JFrame getFrame() {
-		return frame;
+
+	public void prepareFrame( int width, int height ) {
+		getContentPane().removeAll();
+		revalidate();
+		setSize( width, height );
+		setLocationRelativeTo( null );
 	}
 
 	// Shows menu and return button input
@@ -52,8 +51,7 @@ public class WindowManager {
 		JButton playButton = new JButton( "PLAY" ), scoreboardButton = new JButton( "SCOREBOARD" ),
 				quitButton = new JButton( "QUIT" );
 
-		frame.setSize( 450, 300 );
-		frame.setLocationRelativeTo( null );
+		prepareFrame( 450, 300 );
 
 		// Explicitly set the size to what you want
 		playButton.setPreferredSize( new Dimension( 150, 75 ) );
@@ -64,7 +62,7 @@ public class WindowManager {
 		addButtonListener( scoreboardButton, 1 );
 		addButtonListener( quitButton, 2 );
 
-		frame.add( panel );
+		add( panel );
 		panel.setLayout( new GridLayout( 3, 1, 20, 20 ) );
 		panel.setBorder( BorderFactory.createEmptyBorder( 20, 50, 20, 50 ) );
 
@@ -73,7 +71,7 @@ public class WindowManager {
 		panel.add( quitButton );
 
 		// Finally display the frame
-		frame.revalidate();
+		revalidate();
 
 		boolean hasRun = false;
 		while ( !hasRun ) {
@@ -93,45 +91,47 @@ public class WindowManager {
 			}
 		}
 		input = -1;
-		frame.remove( panel );
+		remove( panel );
 		return menuAction;
 	}
 
 	// Starts game
-	public MENU_ACTION showGame( Game game ) throws IOException {
-		game.start( frame );
+	public MENU_ACTION showGame() {
+
+		prepareFrame( 250, 850 );
+		Game game = new Game();
+		add( game );
+		revalidate();
+		game.play();
+
 		return MENU_ACTION.MENU;
 	}
 
 	// Shows scoreboard
-	public MENU_ACTION showScoreboard(ArrayList<Game> games) {
+	public MENU_ACTION showScoreboard( ArrayList<Integer> scores ) {
 
 		JLabel label = new JLabel( "" );
 		JPanel panel = new JPanel();
 		JButton button = new JButton( "MENU" );
 		String message = "";
 
-		frame.setSize( 450, 300 );
-		frame.setLocationRelativeTo( null );
+		prepareFrame( 450, 300 );
 
 		button.setPreferredSize( new Dimension( 150, 75 ) );
 
 		addButtonListener( button, 3 );
 
-		frame.add( panel );
+		add( panel );
 		panel.setLayout( new GridLayout( 3, 1, 20, 20 ) );
 		panel.setBorder( BorderFactory.createEmptyBorder( 20, 50, 20, 50 ) );
 		panel.add( label );
 
 		panel.add( button );
 
-		frame.revalidate();
+		revalidate();
 
-		for ( int i = 0; i < games.size(); i++ ) {
-			if ( games.get( i ).isGameOver() ) {
-				message += String.format( "<p>Game %02d --------------- %03d points<p>", i,
-						games.get( i ).getScore() );
-			}
+		for ( int i = 0; i < scores.size(); i++ ) {
+			message += String.format( "<p>Game %02d : %03d points<p>", i, scores.get( i ) );
 			// PRINT
 			message = "<html><h1>SCOREBOARD</h1>" + message + "</html>";
 			label.setText( message );
@@ -141,7 +141,7 @@ public class WindowManager {
 		while ( !hasRun ) {
 			if ( input == 3 ) {
 				hasRun = true;
-				frame.remove( panel );
+				remove( panel );
 				input = -1;
 			}
 		}

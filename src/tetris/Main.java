@@ -9,8 +9,7 @@ public class Main {
 	// TODO Spice-up UI
 	// TODO scoreboard
 
-	static volatile int input = -1;
-	private static ArrayList<Game> games = new ArrayList<Game>();
+	private static ArrayList<Integer> scores = new ArrayList<Integer>();
 
 	public static void main( String[] args ) throws IOException {
 
@@ -19,12 +18,10 @@ public class Main {
 		while ( true ) {
 			switch ( action ) {
 			case PLAY:
-				Game game = new Game(windowManager.getFrame());
-				games.add( game );
-				action = windowManager.showGame( game );
+				action = windowManager.showGame();
 				break;
 			case SCOREBOARD:
-				action = windowManager.showScoreboard( games );
+				action = windowManager.showScoreboard( scores );
 				break;
 			case QUIT:
 				System.exit( 0 );
@@ -36,6 +33,5 @@ public class Main {
 			}
 		}
 	}
-
 
 }

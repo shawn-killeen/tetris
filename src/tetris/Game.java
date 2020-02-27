@@ -1,16 +1,14 @@
 package tetris;
 
-
 import java.awt.*;
-import java.io.*;
 import javax.swing.*;
 
-public class Game {
+public class Game extends JPanel {
 
 	// CONSTANTS
 	private final double BASE_SPEED = 1000, FAST_SPEED = 0.05;
 	private final double SPEED_RATE = 0.9;
-	
+
 	// VARIABLES
 	private double gameSpeed = BASE_SPEED;
 	private boolean gameOver = false;
@@ -20,10 +18,18 @@ public class Game {
 	private final Grid GRID;;
 
 	// CONSTRUCTOR
-	public Game(JFrame frame) throws IOException {
-		GRID = new Grid( this);
+	public Game() {
+		GRID = new Grid( this );
+
+		JPanel gamePanel = createGamePanel();
+
+		add( gamePanel );
+
+		revalidate();
+		repaint();
+
 	}
-	
+
 	// RETURN GAME STATE
 	public boolean isGameOver() {
 		return gameOver;
@@ -37,56 +43,32 @@ public class Game {
 	// ADDS POINTS TO THE SCORE
 	public void addScore( int points ) {
 		score += points;
-		gameSpeed = calculateSpeed(false);
+		gameSpeed = calculateSpeed( false );
 	}
-	
-	public double calculateSpeed(boolean accelerate) {
-		double speed = BASE_SPEED * Math.pow(SPEED_RATE, score);;
-		if(accelerate)
-		speed *= FAST_SPEED;
+
+	public double calculateSpeed( boolean accelerate ) {
+		double speed = BASE_SPEED * Math.pow( SPEED_RATE, score );
+		;
+		if ( accelerate )
+			speed *= FAST_SPEED;
 		return speed;
 	}
 
-	// STARTS THE GAME
-	public void start(JFrame frame) throws IOException {
-		JPanel panel = new JPanel();
-		JPanel scorePanel = new JPanel();
-		JPanel gamePanel = new JPanel();
-		JLabel scoreboard = new JLabel("Test");
-		scorePanel.add( scoreboard);
-		scorePanel.setPreferredSize( new Dimension(210, 25) );
-		gamePanel.setPreferredSize( new Dimension(210, 810) );
-		
-		panel.setLayout( new BoxLayout(panel, BoxLayout.Y_AXIS) );
-		
-		panel.add(scorePanel);
-		panel.add(gamePanel);
-		frame.add( panel );
-		frame.setSize( 210, 835 );
-		frame.setLocationRelativeTo( null );
-		
-		frame.addKeyListener( new GameInput(this) );
-		frame.setVisible( false );
-		frame.setVisible( true );
-		createGamePanel(frame, gamePanel);
-		frame.revalidate();
-		play(frame);
-		
-		gameOver = true;
-		frame.remove(panel);
-		
-		frame.revalidate();
-		
-	}
-
 	// RUNS THE GAME
-	private void play(JFrame frame) throws IOException {
+	public void play() {
+
 		double lastTime = gameSpeed;
+
+		setFocusable( true );
+		requestFocus();
+		addKeyListener( new GameInput(this) );
 
 		while ( !gameOver ) {
 			// CONTROLS CYCLE SPEED
 			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
 				lastTime = System.currentTimeMillis();
+
+				// frame.revalidate();
 
 				// SPAWNS SHAPE WHEN NONE IS PRESENT
 				GRID.spawnShape();
@@ -95,26 +77,31 @@ public class Game {
 				gameOver = GRID.isDead();
 			}
 		}
+		System.out.println( "GAMEOVER" );
 	}
 
-	private void createGamePanel(JFrame frame, JPanel panel)throws IOException {
-		Cell[][] cells = GRID.getCells();;
-	
-		panel.setLayout(new GridBagLayout());
-		
+	private JPanel createGamePanel() {
+
+		JPanel panel = new JPanel();
+		Cell[][] cells = GRID.getCells();
+
+		panel.setPreferredSize( new Dimension( 210, 810 ) );
+		panel.setLayout( new GridBagLayout() );
+
 		GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(1, 1, 1, 1);
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        
-        gbc.fill = GridBagConstraints.BOTH;
-        for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
-            gbc.gridy = Grid.HEIGHT-y;
-            for ( int x = 0; x <  Grid.WIDTH; x++ ) {
-                gbc.gridx = x;
-                panel.add(cells[x][y], gbc);
-            }
-        }
+		gbc.insets = new Insets( 1, 1, 1, 1 );
+		gbc.weightx = 1;
+		gbc.weighty = 1;
+
+		gbc.fill = GridBagConstraints.BOTH;
+		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
+			gbc.gridy = Grid.HEIGHT - y;
+			for ( int x = 0; x < Grid.WIDTH; x++ ) {
+				gbc.gridx = x;
+				panel.add( cells[x][y], gbc );
+			}
+		}
+		return panel;
 	}
 
 	public void input( GameInput.INPUT_TYPE input ) {
@@ -130,15 +117,15 @@ public class Game {
 			} else if ( input == GameInput.INPUT_TYPE.TURN ) {
 				GRID.rotateCells( activeCells );
 			}
-		}	
-		
+		}
+
 		// SPEED INPUT
 		if ( input == GameInput.INPUT_TYPE.SLOWDOWN ) {
-			gameSpeed = calculateSpeed(false);
+			gameSpeed = calculateSpeed( false );
 		} else if ( input == GameInput.INPUT_TYPE.SPEEDUP ) {
-			gameSpeed = calculateSpeed(true);
+			gameSpeed = calculateSpeed( true );
 		}
-		
+
 		// QUIT
 		if ( input == GameInput.INPUT_TYPE.QUIT ) {
 			gameOver = true;

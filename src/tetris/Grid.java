@@ -27,7 +27,7 @@ public class Grid {
 		Cell[][] cells = new Cell[WIDTH][HEIGHT];
 		for ( int x = 0; x < WIDTH; x++ ) {
 			for ( int y = HEIGHT - 1; y >= 0; y-- ) {
-				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY, Color.BLACK);
+				cells[x][y] = new Cell( x, y, Cell.STATE.EMPTY);
 			}
 		}
 		return cells;
@@ -73,7 +73,7 @@ public class Grid {
 				Cell temp = getCells()[middle + shape.getCoords()[i].getX()][( Grid.HEIGHT )
 						- ( height - shape.getCoords()[i].getY() )];
 
-				temp.setStateColor( Cell.STATE.ACTIVE, shape.getColor());
+				temp.setState( Cell.STATE.ACTIVE);
 			}
 		}
 	}
@@ -122,8 +122,6 @@ public class Grid {
 	// MOVE A GROUP OF CELLS
 	public void moveCells( Coord[] coords, int deltaX, int deltaY ) {
 		
-		Color color = Color.BLACK;
-		
 		// VARIABLES
 		Coord[] activeCoords = this.findActiveCells();
 		boolean valid = true;
@@ -143,7 +141,6 @@ public class Grid {
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
 				Cell temp = getCells()[coord.getX()][coord.getY()];
-				color = temp.getColor();
 				temp.setState( Cell.STATE.EMPTY);
 
 			}
@@ -154,7 +151,7 @@ public class Grid {
 
 				if ( getCells()[coord.getX()][coord.getY()].getState() == Cell.STATE.EMPTY ) {
 					Cell temp = getCells()[coord.getX()][coord.getY()];
-					temp.setStateColor( Cell.STATE.ACTIVE, color );
+					temp.setState( Cell.STATE.ACTIVE );
 				}
 			}
 		}
@@ -221,7 +218,7 @@ public class Grid {
 				// DROPS THE LINES
 				for ( int i = y; i < HEIGHT - 1; i++ ) {
 					for ( int x = 0; x < WIDTH; x++ ) {
-						this.getCells()[x][i].setStateColor( this.getCells()[x][i + 1].getState(), this.getCells()[x][i + 1].getColor() );
+						this.getCells()[x][i].setState( this.getCells()[x][i + 1].getState() );
 						this.getCells()[x][i + 1].setState( Cell.STATE.EMPTY);
 					}
 				}
