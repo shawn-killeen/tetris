@@ -23,8 +23,9 @@ public class Game extends JPanel{
 	// CONSTRUCTOR
 	public Game() {
 		GRID = new Grid( this );
-
+		setBackground(Color.BLACK);
 		JPanel gamePanel = createGamePanel();
+		gamePanel.setBackground(Color.BLACK);
 		add(gamePanel);
 		
 		repaint();
@@ -71,7 +72,6 @@ public class Game extends JPanel{
 			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
 				lastTime = System.currentTimeMillis();
 
-				// frame.revalidate();
 
 				// SPAWNS SHAPE WHEN NONE IS PRESENT
 				GRID.spawnShape();
@@ -80,20 +80,20 @@ public class Game extends JPanel{
 				gameOver = GRID.isDead();
 			}
 		}
-		System.out.println( "GAMEOVER" );
 	}
 	
 	private void refreshGamePanel() {
 		
 		Grid.STATE[][] states = GRID.getStates();
+		Color[][] colors = GRID.getColors();
 		
 		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
 				if(states[x][y] == Grid.STATE.EMPTY)
-				cells[x][y].setBackground( Color.GRAY );
+				cells[x][y].setBackground( Grid.COLOR_EMPTY );
 				
 				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
-				cells[x][y].setBackground( Color.BLACK );
+				cells[x][y].setBackground( colors[x][y] );
 			}
 		}
 	}
@@ -102,6 +102,7 @@ public class Game extends JPanel{
 
 		JPanel panel = new JPanel();
 		Grid.STATE[][] states = GRID.getStates();
+		Color[][] colors = GRID.getColors();
 		
 		panel.setPreferredSize( new Dimension( 210, 810 ) );
 		panel.setLayout( new GridBagLayout() );
@@ -121,10 +122,10 @@ public class Game extends JPanel{
 				cells[x][y].setPreferredSize( new Dimension( 20, 20 ) );
 				
 				if(states[x][y] == Grid.STATE.EMPTY)
-				cells[x][y].setBackground( Color.GRAY );
+				cells[x][y].setBackground( Grid.COLOR_EMPTY);
 				
 				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
-				cells[x][y].setBackground( Color.BLACK );
+				cells[x][y].setBackground( colors[x][y] );
 				
 				panel.add( cells[x][y], gbc );
 			}

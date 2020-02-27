@@ -13,8 +13,11 @@ public class Grid {
 	}
 
 	// CONSTANTS
+	public static final Color COLOR_EMPTY = Color.DARK_GRAY;
+	public static final Color COLOR_FULL = Color.BLACK;
 	public static final int WIDTH = 10, HEIGHT = 24;
 	private  STATE[][] states = new STATE[WIDTH][HEIGHT];
+	private  Color[][] colors = new Color[WIDTH][HEIGHT];
 
 	// CONTRUCTOR
 	public Grid( Game game ) {
@@ -28,12 +31,17 @@ public class Grid {
 		for ( int x = 0; x < states.length; x++ ) {
 			for ( int y = states[x].length - 1; y >= 0; y-- ) {
 				states[x][y] = STATE.EMPTY;
+				colors[x][y] = COLOR_FULL;
 			}
 		}
 	}
 	
 	public STATE[][] getStates(){
 		return states;
+	}
+	
+	public Color[][] getColors(){
+		return colors;
 	}
 
 	// RETURNS ALL ACTIVE CELLS ON FIELD
@@ -70,6 +78,7 @@ public class Grid {
 				int x = middle + shape.getCoords()[i].getX();
 				int y = ( Grid.HEIGHT ) - ( height - shape.getCoords()[i].getY() );
 				//temp.setColorWhenFull( shape.getColor() );
+				colors[x][y] = shape.getColor();
 				states[x][y] = STATE.ACTIVE;
 			}
 		}
@@ -103,7 +112,6 @@ public class Grid {
 
 			// LOWERS CELLS
 			if ( isUnderneathClear ) {
-				System.out.println( "LOWERS" );
 				moveCells( activeCells, 0, -1 );
 			}
 			// GROUNDS CELLS
@@ -134,11 +142,11 @@ public class Grid {
 		}
 		// CHECK NEW POSITION WAS OCCUPIED
 		if ( valid ) {
-			//Color goodColor = Color.BLACK;
+			Color goodColor = Color.BLACK;
 			// CLEAR ACTIVE
 			for ( Coord coord : activeCoords ) {
 				states[coord.getX()][coord.getY()]= STATE.EMPTY;
-				//goodColor = temp.getColorWhenFull();
+				goodColor = colors[coord.getX()][coord.getY()];
 				
 			}
 
@@ -148,7 +156,7 @@ public class Grid {
 
 				if ( states[coord.getX()][coord.getY()] == STATE.EMPTY ) {
 					states[coord.getX()][coord.getY()]= STATE.ACTIVE ;
-					//temp.setColorWhenFull( goodColor );
+					colors[coord.getX()][coord.getY()] = goodColor;
 				}
 			}
 		}

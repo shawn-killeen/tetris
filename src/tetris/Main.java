@@ -9,6 +9,7 @@ import javax.swing.*;
 // Manages game instances and menus
 
 public class Main{
+	// TODO Remove menu, only one screen, one game, highscore
 	// TODO Spice-up UI
 	// TODO scoreboard
 	
@@ -17,10 +18,10 @@ public class Main{
 	public static void main( String[] args ) {
 
 		JFrame frame = new JFrame();
-		
 		frame.setResizable( false );
 		frame.setLocationRelativeTo( null );
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		
 		frame.setVisible( true );
 		
 		MENU_ACTION action = MENU_ACTION.MENU;
@@ -79,11 +80,15 @@ public class Main{
 
 		prepareFrame(frame, 450, 300 );
 
+		panel.setBackground(Color.BLACK);
 		// Explicitly set the size to what you want
 		playButton.setPreferredSize( new Dimension( 150, 75 ) );
 		//scoreboardButton.setPreferredSize( new Dimension( 150, 75 ) );
 		quitButton.setPreferredSize( new Dimension( 150, 75 ) );
 
+		playButton.setBackground(Color.LIGHT_GRAY);
+		quitButton.setBackground(Color.LIGHT_GRAY);
+		
 		addButtonListener( playButton, 0 );
 		//addButtonListener( scoreboardButton, 1 );
 		addButtonListener( quitButton, 2 );

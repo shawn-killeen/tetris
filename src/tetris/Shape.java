@@ -26,7 +26,7 @@ public final class Shape {
 
 	private final static Coord[] SHAPE_J_COORDS = { new Coord( 0, 1 ), new Coord( 0, 0 ), new Coord( 1, 0 ),
 			new Coord( 2, 0 ) };
-	public final static Shape SHAPE_J = new Shape( SHAPE_J_COORDS, new Color( 0, 0, 240 ) ); // J-Block
+	public final static Shape SHAPE_J = new Shape( SHAPE_J_COORDS, new Color( 0, 0, 255 ) ); // J-Block
 
 	private final static Coord[] SHAPE_I_COORDS = { new Coord( 0, 0 ), new Coord( 1, 0 ), new Coord( 2, 0 ),
 			new Coord( 3, 0 ) };
