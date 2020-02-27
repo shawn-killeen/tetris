@@ -68,17 +68,16 @@ public class Grid {
 		if ( findActiveCells().size() == 0 ) {
 
 			// VARIABLES
-			Shape shape = Shape.randomShape();
-			int height = Coord.calculateHeight( shape.getCoords() );
-			int width = Coord.calculateWidth( shape.getCoords() );
+			Tetromino tetromino = Tetromino.randomTetromino();
+			int height = Coord.calculateHeight( tetromino.getCoords() );
+			int width = Coord.calculateWidth( tetromino.getCoords() );
 			int middle = ( WIDTH - width ) / 2;
 
 			// PLACES CELLS ON GRID
-			for ( int i = 0; i < shape.getCoords().length; i++ ) {
-				int x = middle + shape.getCoords()[i].getX();
-				int y = ( Grid.HEIGHT ) - ( height - shape.getCoords()[i].getY() );
-				//temp.setColorWhenFull( shape.getColor() );
-				colors[x][y] = shape.getColor();
+			for ( int i = 0; i < tetromino.getCoords().length; i++ ) {
+				int x = middle + tetromino.getCoords()[i].getX();
+				int y = ( Grid.HEIGHT ) - ( height - tetromino.getCoords()[i].getY() );
+				colors[x][y] = tetromino.getColor();
 				states[x][y] = STATE.ACTIVE;
 			}
 		}

@@ -4,8 +4,9 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 
-public class Game extends JPanel{
+public class Game extends JPanel {
 
 	// CONSTANTS
 	private final double BASE_SPEED = 1000, FAST_SPEED = 0.05;
@@ -23,14 +24,8 @@ public class Game extends JPanel{
 	// CONSTRUCTOR
 	public Game() {
 		GRID = new Grid( this );
-		setBackground(Color.BLACK);
-		JPanel gamePanel = createGamePanel();
-		gamePanel.setBackground(Color.BLACK);
-		add(gamePanel);
-		
-		repaint();
-		revalidate();
-
+		setBackground( Grid.COLOR_EMPTY );
+		createGamePanel();
 	}
 
 	// RETURN GAME STATE
@@ -58,20 +53,19 @@ public class Game extends JPanel{
 	}
 
 	// RUNS THE GAME
-	public void play() {
+	public int play() {
 
 		double lastTime = gameSpeed;
 
 		setFocusable( true );
 		requestFocus();
-		addKeyListener( new GameInput(this) );
+		addKeyListener( new GameInput( this ) );
 
 		while ( !gameOver ) {
 			refreshGamePanel();
 			// CONTROLS CYCLE SPEED
 			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
 				lastTime = System.currentTimeMillis();
-
 
 				// SPAWNS SHAPE WHEN NONE IS PRESENT
 				GRID.spawnShape();
@@ -80,35 +74,45 @@ public class Game extends JPanel{
 				gameOver = GRID.isDead();
 			}
 		}
+
+		return score;
 	}
-	
+
 	private void refreshGamePanel() {
-		
+
 		Grid.STATE[][] states = GRID.getStates();
 		Color[][] colors = GRID.getColors();
-		
+
 		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
-				if(states[x][y] == Grid.STATE.EMPTY)
-				cells[x][y].setBackground( Grid.COLOR_EMPTY );
 				
-				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
-				cells[x][y].setBackground( colors[x][y] );
+				if ( states[x][y] == Grid.STATE.EMPTY ) {
+					if(cells[x][y].getBackground() != Grid.COLOR_EMPTY) {
+					cells[x][y].setBackground( Grid.COLOR_EMPTY );
+					cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
+					}
+				}
+
+				if ( states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE ) {
+					cells[x][y].setBackground( colors[x][y] );
+					cells[x][y].setBorder( BorderFactory.createBevelBorder( BevelBorder.RAISED, colors[x][y].brighter().brighter(),
+							colors[x][y].darker().darker() ) );
+				}
+
+				//cells[x][y].repaint();
 			}
 		}
 	}
 
-	private JPanel createGamePanel() {
+	private void createGamePanel() {
 
-		JPanel panel = new JPanel();
 		Grid.STATE[][] states = GRID.getStates();
 		Color[][] colors = GRID.getColors();
-		
-		panel.setPreferredSize( new Dimension( 210, 810 ) );
-		panel.setLayout( new GridBagLayout() );
+
+		setLayout( new GridBagLayout() );
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets( 1, 1, 1, 1 );
+		gbc.insets = new Insets( 0, 0, 0, 0 );
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 
@@ -118,19 +122,18 @@ public class Game extends JPanel{
 			for ( int x = 0; x < Grid.WIDTH; x++ ) {
 				gbc.gridx = x;
 				cells[x][y] = new JPanel();
-				
+
 				cells[x][y].setPreferredSize( new Dimension( 20, 20 ) );
-				
-				if(states[x][y] == Grid.STATE.EMPTY)
-				cells[x][y].setBackground( Grid.COLOR_EMPTY);
-				
-				if(states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE)
-				cells[x][y].setBackground( colors[x][y] );
-				
-				panel.add( cells[x][y], gbc );
+
+				if ( states[x][y] == Grid.STATE.EMPTY ) {
+					cells[x][y].setBackground( Grid.COLOR_EMPTY );
+				cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
+
+				}
+				add( cells[x][y], gbc );
 			}
 		}
-		return panel;
+		;
 	}
 
 	public void input( GameInput.INPUT_TYPE input ) {
