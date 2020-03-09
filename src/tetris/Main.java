@@ -3,6 +3,9 @@ package tetris;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -55,13 +58,25 @@ public class Main {
 		scoreHeaderPanel.setBackground( Color.DARK_GRAY );
 		scoreHeaderPanel.setBorder( BorderFactory.createLineBorder(Color.DARK_GRAY.darker(), 2));
 		
+		JLabel scoreHeaderLabel = new JLabel("HIGHSCORE");
+		scoreHeaderLabel.setForeground(Color.LIGHT_GRAY);
+		scoreHeaderLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		
+		scoreHeaderPanel.add(scoreHeaderLabel);
+		
 		JPanel scorePanel = new JPanel();
-		scorePanel.setPreferredSize( new Dimension( 190, 310 ) );
+		scorePanel.setPreferredSize( new Dimension( 190, 150) );
 		scorePanel.setBackground( Color.DARK_GRAY );
 		scorePanel.setBorder( BorderFactory.createLineBorder(Color.DARK_GRAY.darker(), 2));
 		
+		JLabel scoreLabel = new JLabel("00");
+		scoreLabel.setForeground(Color.LIGHT_GRAY);
+		scoreLabel.setFont(new Font("Arial", Font.BOLD, 100));
+		
+		scorePanel.add(scoreLabel);
+		
 		JPanel helpPanel = new JPanel();
-		helpPanel.setPreferredSize( new Dimension( 190, 210 ) );
+		helpPanel.setPreferredSize( new Dimension( 190, 370 ) );
 		helpPanel.setBackground( Color.DARK_GRAY );
 		helpPanel.setBorder( BorderFactory.createLineBorder(Color.DARK_GRAY.darker(), 2));
 		
@@ -69,10 +84,11 @@ public class Main {
 		textPanel.add( scorePanel );
 		textPanel.add( helpPanel );
 
-		JButton quitButton = new JButton( "Quit Game" );
+		JButton quitButton = new JButton( "QUIT GAME" );
 		quitButton.setPreferredSize( new Dimension( 510, 50 ) );
 		quitButton.setBackground( Color.DARK_GRAY );
 		quitButton.setForeground(Color.LIGHT_GRAY);
+		quitButton.setFont(new Font("Arial", Font.BOLD, 20));
 		quitButton.setBorder( BorderFactory.createBevelBorder( BevelBorder.RAISED, Color.DARK_GRAY.darker(),
 				Color.DARK_GRAY.darker() ) );
 		quitButton.addActionListener( new ActionListener() {
@@ -123,8 +139,17 @@ public class Main {
 			gamePanel.revalidate();
 			scores.add( game.play() );
 			gamePanel.remove( game );
+			refreshScoreboard(scoreLabel);
 		}
 
+	}
+	
+	private static void refreshScoreboard(JLabel text) {
+		ArrayList<Integer> scoresCopy = (ArrayList<Integer>)scores.clone();
+		
+		Collections.sort(scoresCopy);
+
+		text.setText(scoresCopy.get(0).toString());
 	}
 
 }
