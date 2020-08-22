@@ -24,8 +24,8 @@ public class Game extends JPanel {
 
 	// CONSTRUCTOR
 	public Game() {
-		GRID = new Grid( this );
-		setBackground( Grid.COLOR_EMPTY );
+		GRID = new Grid(this);
+		setBackground(Grid.COLOR_EMPTY);
 		createGamePanel();
 	}
 
@@ -40,15 +40,15 @@ public class Game extends JPanel {
 	}
 
 	// ADDS POINTS TO THE SCORE
-	public void addScore( int points ) {
+	public void addScore(int points) {
 		score += points;
-		gameSpeed = calculateSpeed( false );
+		gameSpeed = calculateSpeed(false);
 	}
 
-	public double calculateSpeed( boolean accelerate ) {
-		double speed = BASE_SPEED * Math.pow( SPEED_RATE, score );
+	public double calculateSpeed(boolean accelerate) {
+		double speed = BASE_SPEED * Math.pow(SPEED_RATE, score);
 		;
-		if ( accelerate )
+		if (accelerate)
 			speed *= FAST_SPEED;
 		return speed;
 	}
@@ -58,14 +58,14 @@ public class Game extends JPanel {
 
 		double lastTime = gameSpeed;
 
-		setFocusable( true );
+		setFocusable(true);
 		requestFocus();
-		addKeyListener( new GameInput( this ) );
+		addKeyListener(new GameInput(this));
 
-		while ( !gameOver ) {
+		while (!gameOver) {
 			refreshGamePanel();
 			// CONTROLS CYCLE SPEED
-			if ( System.currentTimeMillis() - lastTime >= gameSpeed ) {
+			if (System.currentTimeMillis() - lastTime >= gameSpeed) {
 				lastTime = System.currentTimeMillis();
 
 				// SPAWNS SHAPE WHEN NONE IS PRESENT
@@ -84,20 +84,20 @@ public class Game extends JPanel {
 		Grid.STATE[][] states = GRID.getStates();
 		Color[][] colors = GRID.getColors();
 
-		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
-			for ( int x = 0; x < Grid.WIDTH; x++ ) {
+		for (int y = Grid.HEIGHT - 1; y >= 0; y--) {
+			for (int x = 0; x < Grid.WIDTH; x++) {
 
-				if ( states[x][y] == Grid.STATE.EMPTY ) {
-					if ( cells[x][y].getBackground() != Grid.COLOR_EMPTY ) {
-						cells[x][y].setBackground( Grid.COLOR_EMPTY );
-						cells[x][y].setBorder( BorderFactory.createLineBorder( Grid.COLOR_EMPTY.darker(), 1 ) );
+				if (states[x][y] == Grid.STATE.EMPTY) {
+					if (cells[x][y].getBackground() != Grid.COLOR_EMPTY) {
+						cells[x][y].setBackground(Grid.COLOR_EMPTY);
+						cells[x][y].setBorder(BorderFactory.createLineBorder(Grid.COLOR_EMPTY.darker(), 1));
 					}
 				}
 
-				if ( states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE ) {
-					cells[x][y].setBackground( colors[x][y] );
-					cells[x][y].setBorder( BorderFactory.createBevelBorder( BevelBorder.RAISED,
-							colors[x][y].brighter().brighter(), colors[x][y].darker().darker() ) );
+				if (states[x][y] == Grid.STATE.FULL || states[x][y] == Grid.STATE.ACTIVE) {
+					cells[x][y].setBackground(colors[x][y]);
+					cells[x][y].setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED,
+							colors[x][y].brighter().brighter(), colors[x][y].darker().darker()));
 				}
 			}
 		}
@@ -107,51 +107,51 @@ public class Game extends JPanel {
 
 		Grid.STATE[][] states = GRID.getStates();
 
-		setLayout( new GridBagLayout() );
+		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.insets = new Insets( 0, 0, 0, 0 );
+		gbc.insets = new Insets(0, 0, 0, 0);
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 
 		gbc.fill = GridBagConstraints.BOTH;
-		for ( int y = Grid.HEIGHT - 1; y >= 0; y-- ) {
+		for (int y = Grid.HEIGHT - 1; y >= 0; y--) {
 			gbc.gridy = Grid.HEIGHT - y;
-			for ( int x = 0; x < Grid.WIDTH; x++ ) {
+			for (int x = 0; x < Grid.WIDTH; x++) {
 				gbc.gridx = x;
 				cells[x][y] = new JPanel();
 
-				cells[x][y].setPreferredSize( new Dimension( 20, 20 ) );
+				cells[x][y].setPreferredSize(new Dimension(20, 20));
 
-				add( cells[x][y], gbc );
+				add(cells[x][y], gbc);
 			}
 		}
 	}
 
-	public void input( GameInput.INPUT_TYPE input ) {
+	public void input(GameInput.INPUT_TYPE input) {
 
 		ArrayList<Point> activePoints = GRID.findActivePoints();
 
 		// MOVEMENT INPUT
-		if ( activePoints.size() > 0 ) {
-			if ( input == GameInput.INPUT_TYPE.LEFT ) {
-				GRID.moveCells( activePoints, -1, 0 );
-			} else if ( input == GameInput.INPUT_TYPE.RIGHT ) {
-				GRID.moveCells( activePoints, 1, 0 );
-			} else if ( input == GameInput.INPUT_TYPE.TURN ) {
-				GRID.rotateCells( activePoints );
+		if (activePoints.size() > 0) {
+			if (input == GameInput.INPUT_TYPE.LEFT) {
+				GRID.moveCells(activePoints, -1, 0);
+			} else if (input == GameInput.INPUT_TYPE.RIGHT) {
+				GRID.moveCells(activePoints, 1, 0);
+			} else if (input == GameInput.INPUT_TYPE.TURN) {
+				GRID.rotateCells(activePoints);
 			}
 		}
 
 		// SPEED INPUT
-		if ( input == GameInput.INPUT_TYPE.SLOWDOWN ) {
-			gameSpeed = calculateSpeed( false );
-		} else if ( input == GameInput.INPUT_TYPE.SPEEDUP ) {
-			gameSpeed = calculateSpeed( true );
+		if (input == GameInput.INPUT_TYPE.SLOWDOWN) {
+			gameSpeed = calculateSpeed(false);
+		} else if (input == GameInput.INPUT_TYPE.SPEEDUP) {
+			gameSpeed = calculateSpeed(true);
 		}
 
 		// QUIT
-		if ( input == GameInput.INPUT_TYPE.QUIT ) {
+		if (input == GameInput.INPUT_TYPE.QUIT) {
 			gameOver = true;
 		}
 
