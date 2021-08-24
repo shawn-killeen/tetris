@@ -1,5 +1,3 @@
-package tetris;
-
 public final class Point {
 
 	// CONSTANTS

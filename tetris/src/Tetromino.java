@@ -1,5 +1,3 @@
-package tetris;
-
 import java.awt.Color;
 
 public final class Tetromino {
